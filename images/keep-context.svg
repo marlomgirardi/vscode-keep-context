@@ -1,0 +1,13 @@
+
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="sqr" width="11.25" height="11.25" rx="2"/>
+        <path id="crv" d="M2.13174013,9.55717363 C2.36813342,5.06345864 5.51794876,2.23083172 9.63174013,2.05717363"/>
+    </defs>
+    <g fill="none" stroke="#D7DAE0" stroke-width="1.5" transform="translate(1.057700, 1.054609)">
+        <use xlink:href="#sqr" x="12.6635445" y="0"/>
+        <use xlink:href="#sqr" x="0" y="12.5803117"/>
+        <use xlink:href="#crv" />
+        <use xlink:href="#crv" transform="rotate(-180.000000) translate(-23.99, -23.86)"/>
+    </g>
+</svg>
