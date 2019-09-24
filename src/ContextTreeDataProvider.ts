@@ -1,15 +1,50 @@
 import * as vscode from 'vscode';
+import { window, workspace } from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class ContextTreeDataProvider implements vscode.TreeDataProvider<ContextTreeItem> {
-  private workspaceFolders?: vscode.WorkspaceFolder[];
+  /**
+   * List of workspace folders or `undefined` when no folder is open.
+   */
+  private readonly workspaceFolders?: vscode.WorkspaceFolder[] = workspace.workspaceFolders;
 
-  statusBarItem: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  /**
+   * Keep Context status bar item.
+   */
+  public readonly statusBarItem: vscode.StatusBarItem = window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    100,
+  );
+
+  private vsCodeSettings?: string;
+
+  private keepContextSettings?: string;
+
+  private settings = {
+    tasks: {},
+  };
 
   constructor() {
-    this.workspaceFolders = vscode.workspace.workspaceFolders;
-
     if (this.workspaceFolders) {
-      // TODO: load stuff
+      this.vsCodeSettings = path.join(this.workspaceFolders[0].uri.fsPath, '.vscode');
+      this.keepContextSettings = path.join(this.vsCodeSettings, 'keep-context.json');
+
+      this.loadSettings();
+    }
+  }
+
+  /**
+   * Prepare the Keep Context settings.
+   * It will try to load the configuration, if it don't exists, create a new one.
+   */
+  private loadSettings() {
+    if (this.keepContextSettings) {
+      if (fs.existsSync(this.keepContextSettings)) {
+        this.settings = JSON.parse(fs.readFileSync(this.keepContextSettings, 'utf-8'));
+      } else {
+        fs.writeFileSync(this.keepContextSettings, JSON.stringify(this.settings, null, 2), { encoding: 'utf-8' });
+      }
     }
   }
 
@@ -17,7 +52,7 @@ export class ContextTreeDataProvider implements vscode.TreeDataProvider<ContextT
 
   getChildren(element?: ContextTreeItem): Thenable<ContextTreeItem[]> {
     if (!this.workspaceFolders) {
-      vscode.window.showWarningMessage('Keep Context needs a workspace to run');
+      window.showWarningMessage('Keep Context needs a workspace to run');
       return Promise.resolve([]);
     }
 
