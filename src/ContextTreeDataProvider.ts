@@ -11,9 +11,10 @@ import {
   workspace,
 } from 'vscode';
 
+import KeepContext from '.';
 import { ContextTreeItem } from './ContextTreeItem';
 import Settings from './Settings';
-import { createTask, validateTaskInput } from './utils';
+import { createTask, taskInputBox } from './utils';
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
   /**
@@ -68,12 +69,8 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
    * New task handler.
    */
   newTask = (): void => {
-    window
-      .showInputBox({
-        placeHolder: 'Type name for your task',
-        validateInput: validateTaskInput,
-      })
-      .then((taskName?: string) => {
+    taskInputBox()
+      .then((taskName) => {
         if (!taskName) {
           return;
         }
@@ -81,12 +78,48 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
         const task = createTask(taskName);
 
         if (this.settings.tasks[task.id]) {
-          window.showErrorMessage(`A task with name "${taskName}"already exists`);
+          window.showErrorMessage(`A task with name "${taskName}" already exists.`);
           return;
         }
 
         this.settings.tasks[task.id] = task;
         this.settings.save();
+      });
+  }
+
+  /**
+   * Edit task handler.
+   */
+  editTask = (task: ContextTreeItem): void => {
+    taskInputBox(task.label, (value) => {
+      const newTask = createTask(value);
+
+      if (value !== task.label && this.settings.tasks[newTask.id]) {
+        return `A task with name "${value}" already exists.`;
+      }
+
+      return null;
+    })
+      .then((taskName) => {
+        if (taskName && taskName !== task.label) {
+          const newTask = createTask(taskName);
+
+          newTask.files = [...this.settings.tasks[task.id].files];
+
+          this.settings.tasks[newTask.id] = newTask;
+          delete this.settings.tasks[task.id];
+
+          // TODO: Do we really need sort?
+          this.settings.tasks = Object.keys(this.settings.tasks)
+            .sort()
+            .reduce((tasks: { [id: string]: KeepContext.Task }, taskId: string) => {
+              tasks[taskId] = this.settings.tasks[taskId];
+              return tasks;
+            }, {});
+
+          this.settings.save();
+          this.refresh();
+        }
       });
   }
 

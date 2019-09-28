@@ -27,6 +27,10 @@ export default class Settings {
     return this.data.tasks;
   }
 
+  set tasks(tasks: { [name: string]: KeepContext.Task }) {
+    this.data.tasks = tasks;
+  }
+
   save(): void {
     fs.writeFileSync(this.path, JSON.stringify(this.data, null, 2), { encoding: 'utf-8' });
 

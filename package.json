@@ -38,6 +38,14 @@
         "command": "keepContext.newTask",
         "title": "Create Task",
         "category": "Keep Context"
+      },
+      {
+        "command": "keepContext.editTask",
+        "title": "Edit Task",
+        "icon": {
+          "light": "images/light/edit.svg",
+          "dark": "images/dark/edit.svg"
+        }
       }
     ],
     "menus": {
@@ -50,10 +58,11 @@
           "when": "view == keepContext"
         }
       ],
-      "view/title": [
+      "view/item/context": [
         {
-          "command": "keepContext.newTask",
-          "when": "view == keepContext"
+          "command": "keepContext.editTask",
+          "when": "view == keepContext && viewItem == task_item",
+          "group": "inline"
         }
       ]
     }

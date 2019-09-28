@@ -1,3 +1,4 @@
+import { window } from 'vscode';
 import KeepContext from '.';
 
 /**
@@ -15,6 +16,7 @@ export function createTask(name: string): KeepContext.Task {
 
 /**
  * It mostly will be used as validation of `window.showInputBox`.
+ *
  * @param value Input value
  * @returns Returns an string with the **error message** or `null` if it is valid
  */
@@ -27,4 +29,30 @@ export function validateTaskInput(value: string): string | null {
   }
 
   return `${value} is invalid`;
+}
+
+/**
+ * Opens an input box to ask the user for task input.
+ *
+ * @param value The value of `window.showInputBox`
+ * @param validate Holds an extra validation point. For instance, to validate if a task already exists.
+ * @return Thenable of `window.showInputBox`.
+ */
+export function taskInputBox(
+  value?: string,
+  validate?: (value: string) => string | null,
+): Thenable<string | undefined> {
+  return window.showInputBox({
+    placeHolder: 'Type the name of your task',
+    validateInput: (inputVal: string) => {
+      let val = validateTaskInput(inputVal);
+
+      if (!val && validate) {
+        val = validate(inputVal);
+      }
+
+      return val;
+    },
+    value,
+  });
 }
