@@ -46,6 +46,14 @@
           "light": "images/light/edit.svg",
           "dark": "images/dark/edit.svg"
         }
+      },
+      {
+        "command": "keepContext.deleteTask",
+        "title": "Delete Task",
+        "icon": {
+          "light": "images/light/delete.svg",
+          "dark": "images/dark/delete.svg"
+        }
       }
     ],
     "menus": {
@@ -61,6 +69,11 @@
       "view/item/context": [
         {
           "command": "keepContext.editTask",
+          "when": "view == keepContext && viewItem == task_item",
+          "group": "inline"
+        },
+        {
+          "command": "keepContext.deleteTask",
           "when": "view == keepContext && viewItem == task_item",
           "group": "inline"
         }

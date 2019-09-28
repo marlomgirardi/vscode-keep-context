@@ -123,6 +123,15 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
       });
   }
 
+  deleteTask = (task: ContextTreeItem): void => {
+    if (this.settings.tasks[task.id]) {
+      delete this.settings.tasks[task.id];
+
+      this.settings.save();
+      this.refresh();
+    }
+  }
+
   addFile = (document: TextDocument): void => {
     if (document.uri.scheme === 'file') {
       // TODO: add file to the context

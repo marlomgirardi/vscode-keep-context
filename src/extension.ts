@@ -7,6 +7,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.window.registerTreeDataProvider('keepContext', contextTreeDataProvider);
   vscode.commands.registerCommand('keepContext.newTask', contextTreeDataProvider.newTask);
   vscode.commands.registerCommand('keepContext.editTask', contextTreeDataProvider.editTask);
+  vscode.commands.registerCommand('keepContext.deleteTask', contextTreeDataProvider.deleteTask);
 
   vscode.workspace.onDidOpenTextDocument(contextTreeDataProvider.addFile);
   // TODO: removeDocument
