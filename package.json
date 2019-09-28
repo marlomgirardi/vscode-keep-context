@@ -29,12 +29,34 @@
       "keep-context": [
         {
           "id": "keepContext",
-          "name": ""
+          "name": "Tasks"
         }
       ]
     },
-    "commands": [],
-    "menus": {}
+    "commands": [
+      {
+        "command": "keepContext.newTask",
+        "title": "Create Task",
+        "category": "Keep Context"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "keepContext.newTask" }
+      ],
+      "view/title": [
+        {
+          "command": "keepContext.newTask",
+          "when": "view == keepContext"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "keepContext.newTask",
+          "when": "view == keepContext"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -46,7 +68,7 @@
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.7",
+    "@types/node": "^12.7.8",
     "@types/vscode": "^1.38.0",
     "glob": "^7.1.4",
     "mocha": "^6.2.0",

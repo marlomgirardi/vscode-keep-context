@@ -1,7 +1,7 @@
 # VS Code - Keep Context
 
 <div align="center">
-	<img src="images/keep-context.png" alt="Awesome">
+	<img src="images/keep-context.png" alt="Keep Context - VS Code extension">
   <br>
   <br>
   <a href="https://marketplace.visualstudio.com/items?itemName=MarlomGirardi.keep-context" title="Go to VS marketplace">
@@ -75,3 +75,10 @@ Added features X, Y, and Z.
 - [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**
+
+### TODO
+
+- [Use VS Code Configuration?](https://code.visualstudio.com/api/references/contribution-points#Configuration-schema)
+- [Add key bindings](https://code.visualstudio.com/api/references/contribution-points#contributes.keybindings)
+- Tests with TS
+- Configure github actions
