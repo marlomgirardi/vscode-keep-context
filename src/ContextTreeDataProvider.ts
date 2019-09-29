@@ -17,6 +17,7 @@ import Settings from './Settings';
 import { createTask, taskInputBox } from './utils';
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
+
   /**
    * Keep Context status bar item.
    */
@@ -51,7 +52,7 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
     this.onDidChangeTreeData = this.treeItemEventEmitter.event;
 
     this.vsCodeSettings = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
-    this.settings = new Settings(this.vsCodeSettings, this.refresh);
+    this.settings = new Settings(this.vsCodeSettings);
   }
 
   getTreeItem = (element: ContextTreeItem): TreeItem => element;
@@ -59,7 +60,7 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
   getChildren(element?: ContextTreeItem): Thenable<ContextTreeItem[]> {
     // first level of the tree
     if (!element) {
-      return Promise.resolve(Object.values(this.settings.tasks).map(ContextTreeItem.fromTask));
+      return Promise.resolve(ContextTreeItem.fromSettings(this.settings));
     }
 
     return Promise.resolve([]);
@@ -83,7 +84,11 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
         }
 
         this.settings.tasks[task.id] = task;
+        this.settings.activeTask = task.id;
+        // TODO: should close all opened files?
         this.settings.save();
+
+        this.refresh();
       });
   }
 
@@ -117,16 +122,35 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
               return tasks;
             }, {});
 
-          this.settings.save();
-          this.refresh();
+          this.activateTask(newTask.id);
         }
       });
   }
 
+  /**
+   * Delete task handler.
+   */
   deleteTask = (task: ContextTreeItem): void => {
     if (this.settings.tasks[task.id]) {
+      if (this.settings.activeTask === task.id) {
+        this.settings.activeTask = null;
+        // TODO: Close all files?
+        // vscode.commands.executeCommand('workbench.action.closeAllEditors');
+      }
+
       delete this.settings.tasks[task.id];
 
+      this.settings.save();
+      this.refresh();
+    }
+  }
+
+  /**
+   * Activate task handler.
+   */
+  activateTask = (taskId: string): void => {
+    if (this.settings.activeTask !== taskId) {
+      this.settings.activeTask = taskId;
       this.settings.save();
       this.refresh();
     }
