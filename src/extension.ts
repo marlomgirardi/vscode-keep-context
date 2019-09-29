@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('keepContext.activateTask', contextTreeDataProvider.activateTask);
 
   vscode.workspace.onDidOpenTextDocument(contextTreeDataProvider.addFile);
-  // TODO: removeDocument
+  vscode.workspace.onDidCloseTextDocument(contextTreeDataProvider.removeFile);
 
   context.subscriptions.push(contextTreeDataProvider.statusBarItem);
 }

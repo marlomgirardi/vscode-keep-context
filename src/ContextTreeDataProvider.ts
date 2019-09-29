@@ -1,5 +1,6 @@
 import * as path from 'path';
 import {
+  commands,
   Event,
   EventEmitter,
   StatusBarAlignment,
@@ -15,6 +16,15 @@ import KeepContext from '.';
 import { ContextTreeItem } from './ContextTreeItem';
 import Settings from './Settings';
 import { createTask, taskInputBox } from './utils';
+
+/**
+ * Built in VS Code commands.
+ * https://code.visualstudio.com/api/references/commands
+ * https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
+ */
+export enum BuiltInCommands {
+  CloseAllEditors = 'workbench.action.closeAllEditors',
+}
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
 
@@ -78,17 +88,15 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
 
         const task = createTask(taskName);
 
+        // TODO: Add opened files to the current task?
+
         if (this.settings.tasks[task.id]) {
           window.showErrorMessage(`A task with name "${taskName}" already exists.`);
           return;
         }
 
         this.settings.tasks[task.id] = task;
-        this.settings.activeTask = task.id;
-        // TODO: should close all opened files?
-        this.settings.save();
-
-        this.refresh();
+        this.activateTask(task.id);
       });
   }
 
@@ -134,8 +142,19 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
     if (this.settings.tasks[task.id]) {
       if (this.settings.activeTask === task.id) {
         this.settings.activeTask = null;
-        // TODO: Close all files?
-        // vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
+        // TODO: Ask to keep files opened or just close?
+        // window.showInformationMessage('Close all opened files?', 'Yes', 'No')
+        //   .then((selected) => {
+        //     if (selected === 'Yes') {
+        //       commands.executeCommand(BuiltInCommands.CloseAllEditors);
+        //     }
+
+        //     delete this.settings.tasks[task.id];
+
+        //     this.settings.save();
+        //     this.refresh();
+        //   });
       }
 
       delete this.settings.tasks[task.id];
@@ -153,12 +172,50 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
       this.settings.activeTask = taskId;
       this.settings.save();
       this.refresh();
+
+      // TODO: open task files when activated
+      // commands.executeCommand('workbench.action.closeAllEditors')
+      //   .then(() => {
+      //     this.settings.tasks[taskId].files
+      //       .forEach((file: string) => {
+      //         workspace.openTextDocument(file)
+      //           .then(window.showTextDocument);
+      //       });
+      //   });
     }
   }
 
+  /**
+   * Add file to the activated task
+   */
   addFile = (document: TextDocument): void => {
-    if (document.uri.scheme === 'file') {
-      // TODO: add file to the context
+    const activeTask = this.settings.activeTask;
+
+    if (document.uri.scheme === 'file' && activeTask !== null && this.settings.tasks[activeTask]) {
+      const fileName = document.fileName;
+      const task = this.settings.tasks[activeTask];
+
+      if (!task.files.includes(fileName)) {
+        task.files.push(fileName);
+        this.settings.save();
+        this.refresh();
+      }
+    }
+  }
+
+  /**
+   * Remove file from the activated task
+   */
+  removeFile = (document: TextDocument): void => {
+    const activeTask = this.settings.activeTask;
+
+    if (document.uri.scheme === 'file' && activeTask !== null && this.settings.tasks[activeTask]) {
+      const fileName = document.fileName;
+      const task = this.settings.tasks[activeTask];
+      task.files = task.files.filter((file: string) => file !== fileName);
+
+      this.settings.save();
+      this.refresh();
     }
   }
 
