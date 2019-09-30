@@ -33,7 +33,7 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
   /**
    * Keep Context status bar item.
    */
-  readonly statusBarItem: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+  readonly statusBarItem: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
 
   /**
    * Make VS Code listen to our event emitter
@@ -65,6 +65,11 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
 
     this.vsCodeSettings = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
     this.settings = new Settings(this.vsCodeSettings);
+
+    if (this.settings.activeTask) {
+      const task = this.settings.tasks[this.settings.activeTask];
+      this.updateStatusBar(task.name);
+    }
   }
 
   getTreeItem = (element: ContextTreeItem): TreeItem => element;
@@ -180,13 +185,26 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
           this.settings.save();
           this.refresh();
 
-          this.settings.tasks[taskId].files
+          const task = this.settings.tasks[taskId];
+
+          this.updateStatusBar(task.name);
+
+          task.files
             .map(Uri.file)
             .map((file) => {
               window.showTextDocument(file, { viewColumn: ViewColumn.Active, preview: false });
             });
         });
     }
+  }
+
+  /**
+   * Show new text in the status bar.
+   * @param text Status bar item text
+   */
+  updateStatusBar(text: string) {
+    this.statusBarItem.text = '$(tasklist) ' + text;
+    this.statusBarItem.show();
   }
 
   /**
