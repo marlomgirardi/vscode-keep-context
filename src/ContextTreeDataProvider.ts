@@ -8,6 +8,8 @@ import {
   TextDocument,
   TreeDataProvider,
   TreeItem,
+  Uri,
+  ViewColumn,
   window,
   workspace,
 } from 'vscode';
@@ -169,19 +171,21 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
    */
   activateTask = (taskId: string): void => {
     if (this.settings.activeTask !== taskId) {
-      this.settings.activeTask = taskId;
-      this.settings.save();
-      this.refresh();
+      // TODO: use dirty state to prevent saving?
+      this.settings.activeTask = null;
 
-      // TODO: open task files when activated
-      // commands.executeCommand('workbench.action.closeAllEditors')
-      //   .then(() => {
-      //     this.settings.tasks[taskId].files
-      //       .forEach((file: string) => {
-      //         workspace.openTextDocument(file)
-      //           .then(window.showTextDocument);
-      //       });
-      //   });
+      commands.executeCommand(BuiltInCommands.CloseAllEditors)
+        .then(() => {
+          this.settings.activeTask = taskId;
+          this.settings.save();
+          this.refresh();
+
+          this.settings.tasks[taskId].files
+            .map(Uri.file)
+            .map((file) => {
+              window.showTextDocument(file, { viewColumn: ViewColumn.Active, preview: false });
+            });
+        });
     }
   }
 
@@ -190,9 +194,17 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
    */
   addFile = (document: TextDocument): void => {
     const activeTask = this.settings.activeTask;
+    let fileName;
 
-    if (document.uri.scheme === 'file' && activeTask !== null && this.settings.tasks[activeTask]) {
-      const fileName = document.fileName;
+    if (document.uri.scheme === 'file') {
+      fileName = document.fileName;
+    }
+
+    if (document.uri.scheme === 'git') {
+      fileName = document.fileName.replace(/\.git$/, '');
+    }
+
+    if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
       const task = this.settings.tasks[activeTask];
 
       if (!task.files.includes(fileName)) {
