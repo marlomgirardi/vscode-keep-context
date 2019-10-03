@@ -2,6 +2,7 @@
   "name": "keep-context",
   "displayName": "Keep Context",
   "description": "Make context switch easy to be managed and tracked.",
+  "publisher": "marlom",
   "icon": "https://raw.githubusercontent.com/marlomgirardi/vscode-keep-context/master/images/keep-context.png",
   "version": "1.0.0",
   "engines": {

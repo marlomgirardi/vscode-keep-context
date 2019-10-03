@@ -4,11 +4,11 @@
 	<img src="images/keep-context.png" alt="Keep Context - VS Code extension">
   <br>
   <br>
-  <a href="https://marketplace.visualstudio.com/items?itemName=MarlomGirardi.keep-context" title="Go to VS marketplace">
-    <img src="https://vsmarketplacebadge.apphb.com/version-short/MarlomGirardi.vscode-keep-context.svg">
+  <a href="https://marketplace.visualstudio.com/items?itemName=marlom.keep-context" title="Go to VS marketplace">
+    <img src="https://vsmarketplacebadge.apphb.com/version-short/marlom.vscode-keep-context.svg">
   </a>
-  <a href="https://github.com/MarlomGirardi/vscode-keep-context" title="Go to Github repo">
-    <img src="https://vsmarketplacebadge.apphb.com/installs/MarlomGirardi.vscode-keep-context.svg">
+  <a href="https://github.com/marlom/vscode-keep-context" title="Go to Github repo">
+    <img src="https://vsmarketplacebadge.apphb.com/installs/marlom.vscode-keep-context.svg">
   </a>
 </div>
 
@@ -21,7 +21,7 @@ With this extension you won't forget the files that you need to open to continue
 
 In a simple way you can create tasks an track the opened files without get lost when switching context.
 
-![Task management](./images/docs/task-management.gif)
+![Task management](images/docs/task-management.gif)
 
 ## Known Issues
 
@@ -29,4 +29,4 @@ We are just starting but we know that we will have issues, to avoid duplicated i
 
 ## Release Notes
 
-The release notes can be seen in [CHANGELOG.md](./CHANGELOG.md)
+The release notes can be seen in [CHANGELOG.md](CHANGELOG.md)
