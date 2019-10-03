@@ -2,9 +2,9 @@
   "name": "keep-context",
   "displayName": "Keep Context",
   "description": "Make context switch easy to be managed and tracked.",
-  "publisher": "marlom",
-  "icon": "https://raw.githubusercontent.com/marlomgirardi/vscode-keep-context/master/images/keep-context.png",
   "version": "1.0.0",
+  "publisher": "marlom",
+  "icon": "./images/keep-context.png",
   "engines": {
     "vscode": "^1.38.0"
   },
@@ -89,6 +89,13 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
     "test": "node ./out/test/runTest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marlomgirardi/vscode-keep-context.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marlomgirardi/vscode-keep-context/issues"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",

@@ -1,16 +1,9 @@
 # VS Code - Keep Context
 
-<div align="center">
-	<img src="images/keep-context.png" alt="Keep Context - VS Code extension">
-  <br>
-  <br>
-  <a href="https://marketplace.visualstudio.com/items?itemName=marlom.keep-context" title="Go to VS marketplace">
-    <img src="https://vsmarketplacebadge.apphb.com/version-short/marlom.vscode-keep-context.svg">
-  </a>
-  <a href="https://github.com/marlom/vscode-keep-context" title="Go to Github repo">
-    <img src="https://vsmarketplacebadge.apphb.com/installs/marlom.vscode-keep-context.svg">
-  </a>
-</div>
+[![Go to VS marketplace](https://vsmarketplacebadge.apphb.com/version-short/marlom.vscode-keep-context.svg)](https://marketplace.visualstudio.com/items?itemName=marlom.keep-context)
+[![Go to Github repo](https://vsmarketplacebadge.apphb.com/installs/marlom.vscode-keep-context.svg)](https://github.com/marlom/vscode-keep-context)
+
+This extension adds rich language support for the [Go language](https://golang.org/) to VS Code.
 
 This extension was created to help those that at some point need to do some context switch and some times more often than we would like.
 With this extension you won't forget the files that you need to open to continue working in that task.
