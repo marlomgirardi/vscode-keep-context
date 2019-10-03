@@ -1,4 +1,4 @@
-import { window } from 'vscode';
+import { TextDocument, window } from 'vscode';
 import KeepContext from '.';
 
 /**
@@ -55,4 +55,24 @@ export function taskInputBox(
     },
     value,
   });
+}
+
+/**
+ * Some times we receive a document with `uri.schema` equals `git` instead of `file`.
+ * To avoid bugs, they should be treated as valid.
+ *
+ * @param document Text Document from VSCode.
+ */
+export function getRealFileName(document: TextDocument): string | false {
+  let fileName: string | false = false;
+
+  if (document.uri.scheme === 'file') {
+    fileName = document.fileName;
+  }
+
+  if (document.uri.scheme === 'git') {
+    fileName = document.fileName.replace(/\.git$/, '');
+  }
+
+  return fileName;
 }

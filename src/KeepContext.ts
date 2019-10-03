@@ -5,7 +5,7 @@ import KeepContext from '.';
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import Settings from './Settings';
-import { createTask, taskInputBox } from './utils';
+import { createTask, getRealFileName, taskInputBox } from './utils';
 
 /**
  * Built in VS Code commands.
@@ -126,6 +126,10 @@ export default class KeepContext {
       if (this.settings.activeTask === task.id) {
         this.settings.activeTask = null;
 
+        this.updateStatusBar();
+
+        commands.executeCommand(BuiltInCommands.CloseAllEditors);
+
         // TODO: Ask to keep files opened or just close?
         // window.showInformationMessage('Close all opened files?', 'Yes', 'No')
         //   .then((selected) => {
@@ -179,15 +183,7 @@ export default class KeepContext {
    */
   addFile = (document: TextDocument): void => {
     const activeTask = this.settings.activeTask;
-    let fileName;
-
-    if (document.uri.scheme === 'file') {
-      fileName = document.fileName;
-    }
-
-    if (document.uri.scheme === 'git') {
-      fileName = document.fileName.replace(/\.git$/, '');
-    }
+    const fileName = getRealFileName(document);
 
     if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
       const task = this.settings.tasks[activeTask];
@@ -205,9 +201,9 @@ export default class KeepContext {
    */
   removeFile = (document: TextDocument): void => {
     const activeTask = this.settings.activeTask;
+    const fileName = getRealFileName(document);
 
-    if (document.uri.scheme === 'file' && activeTask !== null && this.settings.tasks[activeTask]) {
-      const fileName = document.fileName;
+    if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
       const task = this.settings.tasks[activeTask];
       task.files = task.files.filter((file: string) => file !== fileName);
 
@@ -220,8 +216,13 @@ export default class KeepContext {
    * Show new text in the status bar.
    * @param text Status bar item text
    */
-  updateStatusBar(text: string) {
-    this.statusBarItem.text = '$(tasklist) ' + text;
-    this.statusBarItem.show();
+  updateStatusBar(text?: string) {
+    if (text) {
+      this.statusBarItem.text = '$(tasklist) ' + text;
+      this.statusBarItem.show();
+    } else {
+      this.statusBarItem.text = '';
+      this.statusBarItem.hide();
+    }
   }
 }
