@@ -16,6 +16,12 @@ export enum BuiltInCommands {
   CloseAllEditors = 'workbench.action.closeAllEditors',
 }
 
+/**
+ * KeepContext
+ *
+ * This class is our main class.
+ * It is responsible by managing the status bar and the commands.
+ */
 export default class KeepContext {
 
   treeDataProvider: ContextTreeDataProvider;

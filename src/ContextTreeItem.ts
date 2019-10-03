@@ -2,15 +2,27 @@ import * as path from 'path';
 import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
 import Settings from './Settings';
 
+/**
+ * Contexts are used to create expressions to show/hide things.
+ * They are used mostly in the package.json
+ */
 export enum Contexts {
   TASK = 'task_item',
 }
 
+/**
+ * Icons used in the ContextTreeItem
+ */
 export enum Icons {
   TASK = 'task.svg',
   TASK_ACTIVE = 'task-active.svg',
 }
 
+/**
+ * ContextTreeItem
+ *
+ * Create the item in the tree view responsible to show the tasks.
+ */
 export class ContextTreeItem extends TreeItem {
   constructor(
     readonly id: string,
@@ -31,6 +43,7 @@ export class ContextTreeItem extends TreeItem {
     };
   }
 
+  /** @override */
   get tooltip(): string {
     let tooltip = this.label;
 
@@ -41,6 +54,11 @@ export class ContextTreeItem extends TreeItem {
     return tooltip;
   }
 
+  /**
+   * Extract tasks from settings and create a ContextTreeItem.
+   *
+   * @param settings
+   */
   static fromSettings(settings: Settings): ContextTreeItem[] {
     return Object.values(settings.tasks).map((task) => {
       return new ContextTreeItem(

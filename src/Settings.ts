@@ -3,6 +3,8 @@ import * as path from 'path';
 import KeepContext from '.';
 
 /**
+ * Settings
+ *
  * Manage the settings used in the Keep Context.
  */
 export default class Settings {
