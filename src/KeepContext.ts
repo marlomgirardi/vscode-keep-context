@@ -204,11 +204,17 @@ export default class KeepContext {
     const fileName = getRealFileName(document);
 
     if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
-      const task = this.settings.tasks[activeTask];
-      task.files = task.files.filter((file: string) => file !== fileName);
+      const haveBeenRemoved = !workspace.textDocuments
+        .map((textDoc) => textDoc.fileName)
+        .includes(fileName);
 
-      this.settings.save();
-      this.treeDataProvider.refresh();
+      if (haveBeenRemoved) {
+        const task = this.settings.tasks[activeTask];
+        task.files = task.files.filter((file: string) => file !== fileName);
+
+        this.settings.save();
+        this.treeDataProvider.refresh();
+      }
     }
   }
 
