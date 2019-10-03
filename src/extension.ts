@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
-import { ContextTreeDataProvider } from './ContextTreeDataProvider';
+import KeepContext from './KeepContext';
 
 export function activate(context: vscode.ExtensionContext) {
-  const contextTreeDataProvider = new ContextTreeDataProvider();
+  const keepContext = new KeepContext();
 
-  vscode.window.registerTreeDataProvider('keepContext', contextTreeDataProvider);
-  vscode.commands.registerCommand('keepContext.newTask', contextTreeDataProvider.newTask);
-  vscode.commands.registerCommand('keepContext.editTask', contextTreeDataProvider.editTask);
-  vscode.commands.registerCommand('keepContext.deleteTask', contextTreeDataProvider.deleteTask);
-  vscode.commands.registerCommand('keepContext.activateTask', contextTreeDataProvider.activateTask);
+  vscode.window.registerTreeDataProvider('keepContext', keepContext.treeDataProvider);
+  vscode.commands.registerCommand('keepContext.newTask', keepContext.newTask);
+  vscode.commands.registerCommand('keepContext.editTask', keepContext.editTask);
+  vscode.commands.registerCommand('keepContext.deleteTask', keepContext.deleteTask);
+  vscode.commands.registerCommand('keepContext.activateTask', keepContext.activateTask);
 
-  vscode.workspace.onDidOpenTextDocument(contextTreeDataProvider.addFile);
-  vscode.workspace.onDidCloseTextDocument(contextTreeDataProvider.removeFile);
+  vscode.workspace.onDidOpenTextDocument(keepContext.addFile);
+  vscode.workspace.onDidCloseTextDocument(keepContext.removeFile);
 
-  context.subscriptions.push(contextTreeDataProvider.statusBarItem);
+  context.subscriptions.push(keepContext.statusBarItem);
 }
 
 export function deactivate() {}

@@ -23,22 +23,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "/Users/marlom/Library/Projects/open-source/demo-folder"
-      ],
-      "stopOnEntry": false,
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "npm: watch"
-    },
-    {
-      "name": "Run Extension (2 Folders)",
-      "type": "extensionHost",
-      "request": "launch",
-      "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "/Users/marlom/Library/Projects/open-source/demo-folder",
-        "/Users/marlom/Library/Projects/open-source/demo-folder-2"
+        "${workspaceFolder}/src/test/projects/test-1"
       ],
       "stopOnEntry": false,
       "sourceMaps": true,
@@ -52,7 +37,8 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+        "${workspaceFolder}/src/test/projects/test-1"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "npm: watch"
