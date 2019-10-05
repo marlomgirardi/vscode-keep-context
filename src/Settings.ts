@@ -24,7 +24,7 @@ export default class Settings {
   /**
    * @param settingsPath `.vscode` folder path
    */
-  constructor(settingsPath: string) {
+  constructor(readonly settingsPath: string) {
     this.path = path.join(settingsPath, 'keep-context.json');
 
     this.initialize();
@@ -74,6 +74,10 @@ export default class Settings {
       if (fs.existsSync(this.path)) {
         this.data = JSON.parse(fs.readFileSync(this.path, 'utf-8'));
       } else {
+        if (!fs.existsSync(this.settingsPath)) {
+          fs.mkdirSync(this.settingsPath);
+        }
+
         fs.writeFileSync(this.path, JSON.stringify(this.data, null, 2), { encoding: 'utf-8' });
       }
     }
