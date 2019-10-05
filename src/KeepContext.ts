@@ -1,9 +1,12 @@
 import * as path from 'path';
-import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from 'vscode';
+import {
+  commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace,
+} from 'vscode';
 
 import KeepContext from '.';
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
+import GitProvider from './GitProvider';
 import Settings from './Settings';
 import { createTask, getRealFileName, taskInputBox } from './utils';
 
@@ -37,9 +40,14 @@ export default class KeepContext {
   private vsCodeSettings?: string;
 
   /**
-   * Keep Context settings management
+   * Keep Context settings management.
    */
   private settings: Settings;
+
+  /**
+   * Git provider.
+   */
+  private git: GitProvider;
 
   constructor() {
     if (!workspace.workspaceFolders) {
@@ -48,7 +56,12 @@ export default class KeepContext {
 
     this.vsCodeSettings = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
 
+    this.git = new GitProvider();
+
     this.settings = new Settings(this.vsCodeSettings);
+
+    this.git.onDidChangeBranch = this.onBranchChange;
+    this.git.onDidInitialize = this.onGitInitialize;
 
     if (this.settings.activeTask) {
       const task = this.settings.tasks[this.settings.activeTask];
@@ -69,6 +82,8 @@ export default class KeepContext {
         }
 
         const task = createTask(taskName);
+
+        task.branch = this.git.branch;
 
         // TODO: Add opened files to the current task?
 
@@ -167,6 +182,10 @@ export default class KeepContext {
 
           const task = this.settings.tasks[taskId];
 
+          if (task.branch) {
+            this.git.setBranch(task.branch);
+          }
+
           this.updateStatusBar(task.name);
 
           task.files
@@ -229,6 +248,34 @@ export default class KeepContext {
     } else {
       this.statusBarItem.text = '';
       this.statusBarItem.hide();
+    }
+  }
+
+  /**
+   * Handles the branch change.
+   * @param branch The new branch
+   */
+  private onBranchChange = (branch?: string) => {
+    if (this.settings.activeTask) {
+      const task = this.settings.tasks[this.settings.activeTask];
+
+      task.branch = branch;
+      this.settings.save();
+    }
+  }
+
+  /**
+   * Handles the Git Initialization
+   */
+  private onGitInitialize = () => {
+    if (this.settings.activeTask) {
+      const task = this.settings.tasks[this.settings.activeTask];
+      if (task.branch) {
+        this.git.setBranch(task.branch);
+      } else {
+        task.branch = this.git.branch;
+        this.settings.save();
+      }
     }
   }
 }

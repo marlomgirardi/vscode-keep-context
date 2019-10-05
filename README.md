@@ -10,9 +10,16 @@ With this extension you won't forget the files that you need to open to continue
 
 ### Task management
 
-In a simple way you can create tasks an track the opened files without get lost when switching context.
+In a simple way you can:
+- Create/edit/delete task
+- Track opened files by task
+- Track git branch by task
 
 ![Task management](images/docs/task-management.gif)
+
+## Limitations
+
+- It may work in workspaces with more than one folder, but it only supports single folders.
 
 ## Known Issues
 
