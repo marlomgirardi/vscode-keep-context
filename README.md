@@ -1,7 +1,7 @@
 # VS Code - Keep Context
 
 [![Go to VS marketplace](https://vsmarketplacebadge.apphb.com/version-short/marlom.keep-context.svg)](https://marketplace.visualstudio.com/items?itemName=marlom.keep-context)
-[![Go to Github repo](https://vsmarketplacebadge.apphb.com/installs/marlom.keep-context.svg)](https://github.com/marlom/vscode-keep-context)
+[![Go to Github repo](https://vsmarketplacebadge.apphb.com/installs/marlom.keep-context.svg)](https://github.com/marlomgirardi/vscode-keep-context)
 
 This extension was created to help those that at some point need to do some context switch and some times more often than we would like.
 With this extension you won't forget the files that you need to open to continue working in that task.
