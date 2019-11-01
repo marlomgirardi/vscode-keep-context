@@ -23,7 +23,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "${workspaceFolder}/src/test/project"
+        "${workspaceFolder}/src/test/project-sample"
       ],
       "stopOnEntry": false,
       "sourceMaps": true,
@@ -38,7 +38,7 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "${workspaceFolder}/src/test/project"
+        "${workspaceFolder}/src/test/project-sample"
       ],
       "stopOnEntry": false,
       "sourceMaps": true,
@@ -54,7 +54,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/setupTests",
-        "${workspaceFolder}/src/test/project"
+        "${workspaceFolder}/src/test/project-sample"
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.test.js"],
       "preLaunchTask": "npm: watch"
