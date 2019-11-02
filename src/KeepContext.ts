@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import {
   commands, ExtensionContext,StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace
 } from 'vscode';
@@ -174,6 +175,7 @@ export default class KeepContext {
           this.state.activeTask = taskId;
           this.treeDataProvider.refresh();
 
+          const filesNotFound: Array<string> = [];
           const task = this.state.tasks[taskId];
 
           if (task.branch) {
@@ -183,10 +185,18 @@ export default class KeepContext {
           this.updateStatusBar(task.name);
 
           task.files
+            .filter((file) => {
+              const hasFile = fs.existsSync(file);
+              if (!hasFile) filesNotFound.push(file);
+              return hasFile;
+            })
             .map(Uri.file)
-            .map((file) => {
-              window.showTextDocument(file, { viewColumn: ViewColumn.Active, preview: false });
-            });
+            .forEach((file) => window.showTextDocument(file, { viewColumn: ViewColumn.Active, preview: false }));
+
+          if (filesNotFound.length > 0) {
+            task.files = task.files.filter(file => !filesNotFound.includes(file));
+            window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join('\n')}`);
+          }
         });
     }
   }
