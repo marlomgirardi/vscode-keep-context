@@ -1,14 +1,13 @@
-import * as path from 'path';
 import {
-  commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace,
+  commands, ExtensionContext,StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace
 } from 'vscode';
 
 import KeepContext from '.';
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import GitProvider from './GitProvider';
-import Settings from './Settings';
 import { createTask, getRealFileName, taskInputBox } from './utils';
+import State from './State';
 
 /**
  * Built in VS Code commands.
@@ -35,42 +34,34 @@ export default class KeepContext {
   readonly statusBarItem: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
 
   /**
-   * The path of **.vscode** in the workspace.
+   * Keep Context state management.
    */
-  private vsCodeSettings?: string;
-
-  /**
-   * Keep Context settings management.
-   */
-  private settings: Settings;
+  private state: State;
 
   /**
    * Git provider.
    */
   private git: GitProvider;
 
-  constructor() {
+  constructor(readonly context: ExtensionContext) {
     if (!workspace.workspaceFolders) {
       throw new Error('A workspace is required to run Keep Context.');
     }
 
-    this.vsCodeSettings = path.join(workspace.workspaceFolders[0].uri.fsPath, '.vscode');
-
     this.git = new GitProvider();
-
-    this.settings = new Settings(this.vsCodeSettings);
+    this.state = new State(context.workspaceState);
 
     this.git.onDidChangeBranch = this.onBranchChange;
     this.git.onDidInitialize = this.onGitInitialize;
-    this.treeDataProvider = new ContextTreeDataProvider(this.settings);
+    this.treeDataProvider = new ContextTreeDataProvider(this.state);
 
-    if (this.settings.activeTask) {
-      const task = this.settings.tasks[this.settings.activeTask];
+    if (this.state.activeTask) {
+      const task = this.state.tasks[this.state.activeTask];
 
       if (task) {
         this.updateStatusBar(task.name);
       } else {
-        this.settings.activeTask = null;
+        this.state.activeTask = null;
         this.treeDataProvider.refresh();
       }
     }
@@ -92,12 +83,12 @@ export default class KeepContext {
 
         // TODO: Add opened files to the current task?
 
-        if (this.settings.tasks[task.id]) {
+        if (this.state.tasks[task.id]) {
           window.showErrorMessage(`A task with name "${taskName}" already exists.`);
           return;
         }
 
-        this.settings.tasks[task.id] = task;
+        this.state.tasks[task.id] = task;
         this.activateTask(task.id);
       });
   }
@@ -109,7 +100,7 @@ export default class KeepContext {
     taskInputBox(task.label, (value) => {
       const newTask = createTask(value);
 
-      if (value !== task.label && this.settings.tasks[newTask.id]) {
+      if (value !== task.label && this.state.tasks[newTask.id]) {
         return `A task with name "${value}" already exists.`;
       }
 
@@ -119,17 +110,17 @@ export default class KeepContext {
         if (taskName && taskName !== task.label) {
           const newTask = createTask(taskName);
 
-          newTask.files = [...this.settings.tasks[task.id].files];
+          newTask.files = [...this.state.tasks[task.id].files];
 
-          this.settings.tasks[newTask.id] = newTask;
-          delete this.settings.tasks[task.id];
+          this.state.tasks[newTask.id] = newTask;
+          delete this.state.tasks[task.id];
 
           // TODO: Do we really need sort?
           // If yes, a better one should be used.
-          // this.settings.tasks = Object.keys(this.settings.tasks)
+          // this.state.tasks = Object.keys(this.state.tasks)
           //   .sort()
           //   .reduce((tasks: { [id: string]: KeepContext.Task }, taskId: string) => {
-          //     tasks[taskId] = this.settings.tasks[taskId];
+          //     tasks[taskId] = this.state.tasks[taskId];
           //     return tasks;
           //   }, {});
 
@@ -142,9 +133,9 @@ export default class KeepContext {
    * Delete task handler.
    */
   deleteTask = (task: ContextTreeItem): void => {
-    if (this.settings.tasks[task.id]) {
-      if (this.settings.activeTask === task.id) {
-        this.settings.activeTask = null;
+    if (this.state.tasks[task.id]) {
+      if (this.state.activeTask === task.id) {
+        this.state.activeTask = null;
 
         this.updateStatusBar();
 
@@ -157,16 +148,15 @@ export default class KeepContext {
         //       commands.executeCommand(BuiltInCommands.CloseAllEditors);
         //     }
 
-        //     delete this.settings.tasks[task.id];
+        //     delete this.state.tasks[task.id];
 
-        //     this.settings.save();
+        //     this.state.save();
         //     this.refresh();
         //   });
       }
 
-      delete this.settings.tasks[task.id];
+      delete this.state.tasks[task.id];
 
-      this.settings.save();
       this.treeDataProvider.refresh();
     }
   }
@@ -175,17 +165,16 @@ export default class KeepContext {
    * Activate task handler.
    */
   activateTask = (taskId: string): void => {
-    if (this.settings.activeTask !== taskId) {
+    if (this.state.activeTask !== taskId) {
       // TODO: use dirty state to prevent saving?
-      this.settings.activeTask = null;
+      this.state.activeTask = null;
 
       commands.executeCommand(BuiltInCommands.CloseAllEditors)
         .then(() => {
-          this.settings.activeTask = taskId;
-          this.settings.save();
+          this.state.activeTask = taskId;
           this.treeDataProvider.refresh();
 
-          const task = this.settings.tasks[taskId];
+          const task = this.state.tasks[taskId];
 
           if (task.branch) {
             this.git.setBranch(task.branch);
@@ -206,15 +195,14 @@ export default class KeepContext {
    * Add file to the activated task
    */
   addFile = (document: TextDocument): void => {
-    const activeTask = this.settings.activeTask;
+    const activeTask = this.state.activeTask;
     const fileName = getRealFileName(document);
 
-    if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
-      const task = this.settings.tasks[activeTask];
+    if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
+      const task = this.state.tasks[activeTask];
 
       if (!task.files.includes(fileName)) {
         task.files.push(fileName);
-        this.settings.save();
         this.treeDataProvider.refresh();
       }
     }
@@ -224,19 +212,18 @@ export default class KeepContext {
    * Remove file from the activated task
    */
   removeFile = (document: TextDocument): void => {
-    const activeTask = this.settings.activeTask;
+    const activeTask = this.state.activeTask;
     const fileName = getRealFileName(document);
 
-    if (fileName && activeTask !== null && this.settings.tasks[activeTask]) {
+    if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
       const haveBeenRemoved = !workspace.textDocuments
         .map((textDoc) => textDoc.fileName)
         .includes(fileName);
 
       if (haveBeenRemoved) {
-        const task = this.settings.tasks[activeTask];
+        const task = this.state.tasks[activeTask];
         task.files = task.files.filter((file: string) => file !== fileName);
 
-        this.settings.save();
         this.treeDataProvider.refresh();
       }
     }
@@ -261,11 +248,10 @@ export default class KeepContext {
    * @param branch The new branch
    */
   private onBranchChange = (branch?: string) => {
-    if (this.settings.activeTask) {
-      const task = this.settings.tasks[this.settings.activeTask];
+    if (this.state.activeTask) {
+      const task = this.state.tasks[this.state.activeTask];
 
       task.branch = branch;
-      this.settings.save();
     }
   }
 
@@ -273,13 +259,12 @@ export default class KeepContext {
    * Handles the Git Initialization
    */
   private onGitInitialize = () => {
-    if (this.settings.activeTask) {
-      const task = this.settings.tasks[this.settings.activeTask];
+    if (this.state.activeTask) {
+      const task = this.state.tasks[this.state.activeTask];
       if (task.branch) {
         this.git.setBranch(task.branch);
       } else {
         task.branch = this.git.branch;
-        this.settings.save();
       }
     }
   }

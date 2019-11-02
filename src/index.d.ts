@@ -20,23 +20,6 @@ declare namespace KeepContext {
      */
     branch?: string;
   }
-
-  /**
-   * Represents the settings saved in file.
-   */
-  export interface SettingsData {
-    /**
-     * Id of the current task.
-     */
-    active: string | null;
-
-    /**
-     * Task list
-     */
-    tasks: {
-      [name: string]: Task;
-    };
-  }
 }
 
 export default KeepContext;

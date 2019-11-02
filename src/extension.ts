@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import KeepContext from './KeepContext';
 
 export function activate(context: vscode.ExtensionContext) {
-  const keepContext = new KeepContext();
+  const keepContext = new KeepContext(context);
 
   vscode.window.registerTreeDataProvider('keepContext', keepContext.treeDataProvider);
   vscode.commands.registerCommand('keepContext.newTask', keepContext.newTask);

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
-import Settings from './Settings';
+import State from './State';
 
 /**
  * Contexts are used to create expressions to show/hide things.
@@ -57,14 +57,14 @@ export class ContextTreeItem extends TreeItem {
   /**
    * Extract tasks from settings and create a ContextTreeItem.
    *
-   * @param settings
+   * @param state Extension state
    */
-  static fromSettings(settings: Settings): ContextTreeItem[] {
-    return Object.values(settings.tasks).map((task) => {
+  static fromState(state: State): ContextTreeItem[] {
+    return Object.values(state.tasks).map((task) => {
       return new ContextTreeItem(
         task.id,
         task.name,
-        settings.activeTask === task.id,
+        state.activeTask === task.id,
         Contexts.TASK,
         TreeItemCollapsibleState.None,
         {
