@@ -62,13 +62,18 @@ export default class KeepContext {
 
     this.git.onDidChangeBranch = this.onBranchChange;
     this.git.onDidInitialize = this.onGitInitialize;
+    this.treeDataProvider = new ContextTreeDataProvider(this.settings);
 
     if (this.settings.activeTask) {
       const task = this.settings.tasks[this.settings.activeTask];
-      this.updateStatusBar(task.name);
-    }
 
-    this.treeDataProvider = new ContextTreeDataProvider(this.settings);
+      if (task) {
+        this.updateStatusBar(task.name);
+      } else {
+        this.settings.activeTask = null;
+        this.treeDataProvider.refresh();
+      }
+    }
   }
 
   /**
