@@ -89,7 +89,11 @@ export default class KeepContext {
           return;
         }
 
-        this.state.tasks[task.id] = task;
+        this.state.tasks = {
+          ...this.state.tasks,
+          [task.id]: task
+        };
+
         this.activateTask(task.id);
       });
   }

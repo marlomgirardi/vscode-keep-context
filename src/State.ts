@@ -37,6 +37,6 @@ export default class State {
    * Set the task list
    */
   set tasks(tasks: { [name: string]: KeepContext.Task }) {
-    this.workspaceState.get("tasks", tasks);
+    this.workspaceState.update("tasks", tasks);
   }
 }
