@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixes
+- Replace 'get' by 'update' on workspace method used on State.
+
+### Security
+- Upgrade mocha to remove 'Prototype Pollution' from a dependency.
+
 ### Breaking changes
 - The state of the extension is now saved in the reserved space by VS Code. `keep-context.json` will not be created.
 
