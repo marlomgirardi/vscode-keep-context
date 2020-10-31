@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking changes
 - The state of the extension is now saved in the reserved space by VS Code. `keep-context.json` will not be created.
+- Upgrade project dependencies.
 
 ## 0.1.2 - 2019-12-21
 
