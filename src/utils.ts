@@ -1,5 +1,5 @@
-import { TextDocument, window } from 'vscode';
-import KeepContext from '.';
+import { TextDocument, window } from "vscode";
+import KeepContext from ".";
 
 /**
  * Returns an empty task structure.
@@ -21,9 +21,9 @@ export function createTask(name: string): KeepContext.Task {
  * @returns Returns an string with the **error message** or `null` if it is valid
  */
 export function validateTaskInput(value: string): string | null {
-  if (typeof value === 'string') {
-    if (value === '') {
-      return 'Empty string is not allowed';
+  if (typeof value === "string") {
+    if (value === "") {
+      return "Empty string is not allowed";
     }
     return null;
   }
@@ -43,7 +43,7 @@ export function taskInputBox(
   validate?: (value: string) => string | null,
 ): Thenable<string | undefined> {
   return window.showInputBox({
-    placeHolder: 'Type the name of your task',
+    placeHolder: "Type the name of your task",
     validateInput: (inputVal: string) => {
       let val = validateTaskInput(inputVal);
 
@@ -66,12 +66,12 @@ export function taskInputBox(
 export function getRealFileName(document: TextDocument): string | false {
   let fileName: string | false = false;
 
-  if (document.uri.scheme === 'file') {
+  if (document.uri.scheme === "file") {
     fileName = document.fileName;
   }
 
-  if (document.uri.scheme === 'git') {
-    fileName = document.fileName.replace(/\.git$/, '');
+  if (document.uri.scheme === "git") {
+    fileName = document.fileName.replace(/\.git$/, "");
   }
 
   return fileName;

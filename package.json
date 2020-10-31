@@ -89,7 +89,10 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --config .prettierrc 'src/**/*.ts' --write"
   },
   "keywords": [
     "context",
@@ -111,9 +114,14 @@
     "@types/mocha": "^7.0.2",
     "@types/node": "12.12.21",
     "@types/vscode": "^1.41.0",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "glob": "^7.1.6",
     "mocha": "^8.0.1",
-    "tslint": "^5.20.1",
+    "prettier": "^2.1.2",
     "typescript": "^3.7.4",
     "vscode-test": "^1.3.0"
   }

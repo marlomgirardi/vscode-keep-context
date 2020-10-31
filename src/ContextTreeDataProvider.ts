@@ -1,16 +1,10 @@
-import {
-  Event,
-  EventEmitter,
-  TreeDataProvider,
-  TreeItem,
-} from 'vscode';
+import { Event, EventEmitter, TreeDataProvider, TreeItem } from "vscode";
 
-import { ContextTreeItem } from './ContextTreeItem';
-import State from './State';
+import { ContextTreeItem } from "./ContextTreeItem";
+import State from "./State";
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
-
-    /** @override */
+  /** @override */
   readonly onDidChangeTreeData: Event<ContextTreeItem>;
 
   /**
@@ -42,5 +36,5 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
    */
   refresh = (): void => {
     this.treeItemEventEmitter.fire();
-  }
+  };
 }

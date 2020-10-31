@@ -1,5 +1,5 @@
-import KeepContext from '.';
-import { Memento } from 'vscode';
+import KeepContext from ".";
+import { Memento } from "vscode";
 
 /**
  * State

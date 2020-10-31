@@ -1,14 +1,22 @@
-import * as fs from 'fs';
+import * as fs from "fs";
 import {
-  commands, ExtensionContext,StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace
-} from 'vscode';
+  commands,
+  ExtensionContext,
+  StatusBarAlignment,
+  StatusBarItem,
+  TextDocument,
+  Uri,
+  ViewColumn,
+  window,
+  workspace,
+} from "vscode";
 
-import KeepContext from '.';
-import { ContextTreeDataProvider } from './ContextTreeDataProvider';
-import { ContextTreeItem } from './ContextTreeItem';
-import GitProvider from './GitProvider';
-import { createTask, getRealFileName, taskInputBox } from './utils';
-import State from './State';
+import KeepContext from ".";
+import { ContextTreeDataProvider } from "./ContextTreeDataProvider";
+import { ContextTreeItem } from "./ContextTreeItem";
+import GitProvider from "./GitProvider";
+import { createTask, getRealFileName, taskInputBox } from "./utils";
+import State from "./State";
 
 /**
  * Built in VS Code commands.
@@ -16,7 +24,7 @@ import State from './State';
  * https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
  */
 export enum BuiltInCommands {
-  CloseAllEditors = 'workbench.action.closeAllEditors',
+  CloseAllEditors = "workbench.action.closeAllEditors",
 }
 
 /**
@@ -26,7 +34,6 @@ export enum BuiltInCommands {
  * It is responsible by managing the status bar and the commands.
  */
 export default class KeepContext {
-
   treeDataProvider: ContextTreeDataProvider;
 
   /**
@@ -46,7 +53,7 @@ export default class KeepContext {
 
   constructor(readonly context: ExtensionContext) {
     if (!workspace.workspaceFolders) {
-      throw new Error('A workspace is required to run Keep Context.');
+      throw new Error("A workspace is required to run Keep Context.");
     }
 
     this.git = new GitProvider();
@@ -72,31 +79,30 @@ export default class KeepContext {
    * New task handler.
    */
   newTask = (): void => {
-    taskInputBox()
-      .then((taskName) => {
-        if (!taskName) {
-          return;
-        }
+    taskInputBox().then((taskName) => {
+      if (!taskName) {
+        return;
+      }
 
-        const task = createTask(taskName);
+      const task = createTask(taskName);
 
-        task.branch = this.git.branch;
+      task.branch = this.git.branch;
 
-        // TODO: Add opened files to the current task?
+      // TODO: Add opened files to the current task?
 
-        if (this.state.tasks[task.id]) {
-          window.showErrorMessage(`A task with name "${taskName}" already exists.`);
-          return;
-        }
+      if (this.state.tasks[task.id]) {
+        window.showErrorMessage(`A task with name "${taskName}" already exists.`);
+        return;
+      }
 
-        this.state.tasks = {
-          ...this.state.tasks,
-          [task.id]: task
-        };
+      this.state.tasks = {
+        ...this.state.tasks,
+        [task.id]: task,
+      };
 
-        this.activateTask(task.id);
-      });
-  }
+      this.activateTask(task.id);
+    });
+  };
 
   /**
    * Edit task handler.
@@ -110,29 +116,28 @@ export default class KeepContext {
       }
 
       return null;
-    })
-      .then((taskName) => {
-        if (taskName && taskName !== task.label) {
-          const newTask = createTask(taskName);
+    }).then((taskName) => {
+      if (taskName && taskName !== task.label) {
+        const newTask = createTask(taskName);
 
-          newTask.files = [...this.state.tasks[task.id].files];
+        newTask.files = [...this.state.tasks[task.id].files];
 
-          this.state.tasks[newTask.id] = newTask;
-          delete this.state.tasks[task.id];
+        this.state.tasks[newTask.id] = newTask;
+        delete this.state.tasks[task.id];
 
-          // TODO: Do we really need sort?
-          // If yes, a better one should be used.
-          // this.state.tasks = Object.keys(this.state.tasks)
-          //   .sort()
-          //   .reduce((tasks: { [id: string]: KeepContext.Task }, taskId: string) => {
-          //     tasks[taskId] = this.state.tasks[taskId];
-          //     return tasks;
-          //   }, {});
+        // TODO: Do we really need sort?
+        // If yes, a better one should be used.
+        // this.state.tasks = Object.keys(this.state.tasks)
+        //   .sort()
+        //   .reduce((tasks: { [id: string]: KeepContext.Task }, taskId: string) => {
+        //     tasks[taskId] = this.state.tasks[taskId];
+        //     return tasks;
+        //   }, {});
 
-          this.activateTask(newTask.id);
-        }
-      });
-  }
+        this.activateTask(newTask.id);
+      }
+    });
+  };
 
   /**
    * Delete task handler.
@@ -164,7 +169,7 @@ export default class KeepContext {
 
       this.treeDataProvider.refresh();
     }
-  }
+  };
 
   /**
    * Activate task handler.
@@ -174,36 +179,40 @@ export default class KeepContext {
       // TODO: use dirty state to prevent saving?
       this.state.activeTask = null;
 
-      commands.executeCommand(BuiltInCommands.CloseAllEditors)
-        .then(() => {
-          this.state.activeTask = taskId;
-          this.treeDataProvider.refresh();
+      commands.executeCommand(BuiltInCommands.CloseAllEditors).then(() => {
+        this.state.activeTask = taskId;
+        this.treeDataProvider.refresh();
 
-          const filesNotFound: Array<string> = [];
-          const task = this.state.tasks[taskId];
+        const filesNotFound: Array<string> = [];
+        const task = this.state.tasks[taskId];
 
-          if (task.branch) {
-            this.git.setBranch(task.branch);
-          }
+        if (task.branch) {
+          this.git.setBranch(task.branch);
+        }
 
-          this.updateStatusBar(task.name);
+        this.updateStatusBar(task.name);
 
-          task.files
-            .filter((file) => {
-              const hasFile = fs.existsSync(file);
-              if (!hasFile) filesNotFound.push(file);
-              return hasFile;
-            })
-            .map(Uri.file)
-            .forEach((file) => window.showTextDocument(file, { viewColumn: ViewColumn.Active, preview: false }));
+        task.files
+          .filter((file) => {
+            const hasFile = fs.existsSync(file);
+            if (!hasFile) filesNotFound.push(file);
+            return hasFile;
+          })
+          .map(Uri.file)
+          .forEach((file) =>
+            window.showTextDocument(file, {
+              viewColumn: ViewColumn.Active,
+              preview: false,
+            }),
+          );
 
-          if (filesNotFound.length > 0) {
-            task.files = task.files.filter(file => !filesNotFound.includes(file));
-            window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join('\n')}`);
-          }
-        });
+        if (filesNotFound.length > 0) {
+          task.files = task.files.filter((file) => !filesNotFound.includes(file));
+          window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
+        }
+      });
     }
-  }
+  };
 
   /**
    * Add file to the activated task
@@ -220,7 +229,7 @@ export default class KeepContext {
         this.treeDataProvider.refresh();
       }
     }
-  }
+  };
 
   /**
    * Remove file from the activated task
@@ -230,9 +239,7 @@ export default class KeepContext {
     const fileName = getRealFileName(document);
 
     if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
-      const haveBeenRemoved = !workspace.textDocuments
-        .map((textDoc) => textDoc.fileName)
-        .includes(fileName);
+      const haveBeenRemoved = !workspace.textDocuments.map((textDoc) => textDoc.fileName).includes(fileName);
 
       if (haveBeenRemoved) {
         const task = this.state.tasks[activeTask];
@@ -241,7 +248,7 @@ export default class KeepContext {
         this.treeDataProvider.refresh();
       }
     }
-  }
+  };
 
   /**
    * Show new text in the status bar.
@@ -249,10 +256,10 @@ export default class KeepContext {
    */
   updateStatusBar(text?: string) {
     if (text) {
-      this.statusBarItem.text = '$(tasklist) ' + text;
+      this.statusBarItem.text = "$(tasklist) " + text;
       this.statusBarItem.show();
     } else {
-      this.statusBarItem.text = '';
+      this.statusBarItem.text = "";
       this.statusBarItem.hide();
     }
   }
@@ -267,7 +274,7 @@ export default class KeepContext {
 
       task.branch = branch;
     }
-  }
+  };
 
   /**
    * Handles the Git Initialization
@@ -281,5 +288,5 @@ export default class KeepContext {
         task.branch = this.git.branch;
       }
     }
-  }
+  };
 }
