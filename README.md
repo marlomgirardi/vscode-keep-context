@@ -17,6 +17,10 @@ In a simple way you can:
 
 ![Task management](images/docs/task-management.gif)
 
+## Keybindings
+
+- `Ctrl+K Ctrl+Shift+C` (`Cmd` instead of `Ctrl` for MacOS) to create a task.
+
 ## Limitations
 
 - It may work in workspaces with more than one folder, but it only supports single folders.

@@ -6,7 +6,7 @@
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
-    "vscode": "^1.41.0"
+    "vscode": "^1.50.0"
   },
   "license": "MIT",
   "categories": [
@@ -14,10 +14,19 @@
   ],
   "activationEvents": [
     "onView:keepContext",
-    "onFileSystem:file"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+    }, 
+    "keybindings": [
+      {
+        "key": "ctrl+k ctrl+shift+c",
+        "mac": "cmd+k cmd+shift+c",
+        "command": "keepContext.newTask"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -31,7 +40,7 @@
       "keep-context": [
         {
           "id": "keepContext",
-          "name": "Tasks"
+          "name": "Contexts"
         }
       ]
     },
@@ -44,6 +53,7 @@
       {
         "command": "keepContext.editTask",
         "title": "Edit Task",
+        "category": "Keep Context",
         "icon": {
           "light": "images/light/edit.svg",
           "dark": "images/dark/edit.svg"
@@ -52,6 +62,7 @@
       {
         "command": "keepContext.deleteTask",
         "title": "Delete Task",
+        "category": "Keep Context",
         "icon": {
           "light": "images/light/delete.svg",
           "dark": "images/dark/delete.svg"
@@ -60,9 +71,9 @@
     ],
     "menus": {
       "commandPalette": [
-        {
-          "command": "keepContext.newTask"
-        }
+        { "command": "keepContext.newTask" },
+        { "command": "keepContext.editTask" },
+        { "command": "keepContext.deleteTask" }
       ],
       "view/title": [
         {

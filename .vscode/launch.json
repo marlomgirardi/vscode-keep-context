@@ -46,6 +46,21 @@
       "preLaunchTask": "npm: watch"
     },
     {
+      "name": "Run without extensions external",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "${workspaceFolder}/../vscode-keep-context-test"
+      ],
+      "stopOnEntry": false,
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "npm: watch"
+    },
+    {
       "name": "Tests",
       "type": "extensionHost",
       "request": "launch",
