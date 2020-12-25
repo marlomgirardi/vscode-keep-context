@@ -18,4 +18,9 @@ export interface Task {
    * Branch attached to this task.
    */
   branch?: string;
+
+  /**
+   * Flag to check if the current task is active.
+   */
+  isActive: boolean;
 }

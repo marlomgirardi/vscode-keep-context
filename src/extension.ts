@@ -9,6 +9,7 @@ export function activate(context: vscode.ExtensionContext): void {
   vscode.commands.registerCommand("keepContext.editTask", keepContext.editTask);
   vscode.commands.registerCommand("keepContext.deleteTask", keepContext.deleteTask);
   vscode.commands.registerCommand("keepContext.activateTask", keepContext.activateTask);
+  vscode.commands.registerCommand("keepContext.selectTask", keepContext.selectTask);
 
   vscode.workspace.onDidOpenTextDocument(keepContext.addFile);
   vscode.workspace.onDidCloseTextDocument(keepContext.removeFile);

@@ -16,6 +16,7 @@ import { ContextTreeItem } from "./ContextTreeItem";
 import GitProvider from "./GitProvider";
 import { createTask, getRealFileName, taskInputBox } from "./utils";
 import State from "./State";
+import { QuickPickTask } from "./QuickPickTask";
 
 /**
  * Built in VS Code commands.
@@ -229,6 +230,29 @@ export default class KeepContext {
         this.treeDataProvider.refresh();
       });
     }
+  };
+
+  selectTask = (): void => {
+    const input = window.createQuickPick<QuickPickTask>();
+
+    input.placeholder = "Select a task to activate";
+    input.items = Object.values(this.state.tasks).map(QuickPickTask.fromTask);
+
+    if (input.items.length === 0) {
+      window.showWarningMessage("No task is available for selection");
+      input.dispose();
+      return;
+    }
+
+    input.show();
+
+    input.onDidChangeSelection((quickPickTask) => {
+      this.activateTask(quickPickTask[0].id);
+      input.hide();
+    });
+    input.onDidHide(() => {
+      input.dispose();
+    });
   };
 
   /**

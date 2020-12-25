@@ -20,6 +20,7 @@ In a simple way you can:
 ## Keybindings
 
 - `Ctrl+K Ctrl+Shift+C` (`Cmd` instead of `Ctrl` for MacOS) to create a task.
+- `Ctrl+K Ctrl+Shift+S` (`Cmd` instead of `Ctrl` for MacOS) to select an task to be activated.
 
 ## Limitations
 

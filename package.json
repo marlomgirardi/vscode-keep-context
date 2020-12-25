@@ -25,6 +25,10 @@
         "key": "ctrl+k ctrl+shift+c",
         "mac": "cmd+k cmd+shift+c",
         "command": "keepContext.newTask"
+      }, {
+        "key": "ctrl+k ctrl+shift+s",
+        "mac": "cmd+k cmd+shift+s",
+        "command": "keepContext.selectTask"
       }
     ],
     "viewsContainers": {

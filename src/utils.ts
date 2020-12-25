@@ -11,6 +11,7 @@ export function createTask(name: string): Task {
     files: [],
     id: `task-${name}`,
     name,
+    isActive: false,
   };
 }
 

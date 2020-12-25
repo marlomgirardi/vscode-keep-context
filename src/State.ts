@@ -23,6 +23,15 @@ export default class State {
    * Set the active task.
    */
   set activeTask(taskId: string | null) {
+    const prevActiveTask = this.activeTask;
+    if (prevActiveTask && this.tasks[prevActiveTask]) {
+      this.tasks[prevActiveTask].isActive = false;
+    }
+
+    if (taskId) {
+      this.tasks[taskId].isActive = true;
+    }
+
     this.workspaceState.update("activeTask", taskId);
   }
 
