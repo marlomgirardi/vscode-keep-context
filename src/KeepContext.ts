@@ -11,7 +11,6 @@ import {
   workspace,
 } from "vscode";
 
-import KeepContext from ".";
 import { ContextTreeDataProvider } from "./ContextTreeDataProvider";
 import { ContextTreeItem } from "./ContextTreeItem";
 import GitProvider from "./GitProvider";
@@ -57,10 +56,10 @@ export default class KeepContext {
     }
 
     this.git = new GitProvider();
-    this.state = new State(context.workspaceState);
-
     this.git.onDidChangeBranch = this.onBranchChange;
     this.git.onDidInitialize = this.onGitInitialize;
+
+    this.state = new State(context.workspaceState);
     this.treeDataProvider = new ContextTreeDataProvider(this.state);
 
     if (this.state.activeTask) {
@@ -106,24 +105,34 @@ export default class KeepContext {
 
   /**
    * Edit task handler.
+   * @param task available when using the Keep Context panel.
    */
-  editTask = (task: ContextTreeItem): void => {
-    taskInputBox(task.label, (value) => {
+  editTask = (task?: ContextTreeItem): void => {
+    const taskId = task?.id || this.state.activeTask;
+
+    if (!taskId) {
+      window.showWarningMessage("You must select a task to edit.");
+      return;
+    }
+
+    const selectedTask = this.state.tasks[taskId];
+
+    taskInputBox(selectedTask.name, (value) => {
       const newTask = createTask(value);
 
-      if (value !== task.label && this.state.tasks[newTask.id]) {
+      if (value !== selectedTask.name && this.state.tasks[newTask.id]) {
         return `A task with name "${value}" already exists.`;
       }
 
       return null;
     }).then((taskName) => {
-      if (taskName && taskName !== task.label) {
+      if (taskName && taskName !== selectedTask.name) {
         const newTask = createTask(taskName);
 
-        newTask.files = [...this.state.tasks[task.id].files];
+        newTask.files = [...selectedTask.files];
 
         this.state.tasks[newTask.id] = newTask;
-        delete this.state.tasks[task.id];
+        delete this.state.tasks[selectedTask.id];
 
         // TODO: Do we really need sort?
         // If yes, a better one should be used.
@@ -141,10 +150,18 @@ export default class KeepContext {
 
   /**
    * Delete task handler.
+   * @param task available when using the Keep Context panel.
    */
-  deleteTask = (task: ContextTreeItem): void => {
-    if (this.state.tasks[task.id]) {
-      if (this.state.activeTask === task.id) {
+  deleteTask = (task?: ContextTreeItem): void => {
+    const taskId = task?.id || this.state.activeTask;
+
+    if (!taskId) {
+      window.showWarningMessage("You must select a task to remove.");
+      return;
+    }
+
+    if (this.state.tasks[taskId]) {
+      if (this.state.activeTask === taskId) {
         this.state.activeTask = null;
 
         this.updateStatusBar();
@@ -165,7 +182,7 @@ export default class KeepContext {
         //   });
       }
 
-      delete this.state.tasks[task.id];
+      delete this.state.tasks[taskId];
 
       this.treeDataProvider.refresh();
     }
@@ -181,7 +198,6 @@ export default class KeepContext {
 
       commands.executeCommand(BuiltInCommands.CloseAllEditors).then(() => {
         this.state.activeTask = taskId;
-        this.treeDataProvider.refresh();
 
         const filesNotFound: Array<string> = [];
         const task = this.state.tasks[taskId];
@@ -210,6 +226,7 @@ export default class KeepContext {
           task.files = task.files.filter((file) => !filesNotFound.includes(file));
           window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
         }
+        this.treeDataProvider.refresh();
       });
     }
   };
@@ -254,7 +271,7 @@ export default class KeepContext {
    * Show new text in the status bar.
    * @param text Status bar item text
    */
-  updateStatusBar(text?: string) {
+  updateStatusBar(text?: string): void {
     if (text) {
       this.statusBarItem.text = "$(tasklist) " + text;
       this.statusBarItem.show();
@@ -271,7 +288,6 @@ export default class KeepContext {
   private onBranchChange = (branch?: string) => {
     if (this.state.activeTask) {
       const task = this.state.tasks[this.state.activeTask];
-
       task.branch = branch;
     }
   };

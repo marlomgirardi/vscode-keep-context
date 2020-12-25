@@ -1,5 +1,5 @@
 import { Extension, extensions } from "vscode";
-import * as Git from "./git";
+import * as Git from "./typings/git";
 
 export default class GitProvider {
   branch?: string;
@@ -31,17 +31,13 @@ export default class GitProvider {
     if (this.git.state === "initialized") {
       this.branch = this.getBranch();
       this.listenToBranchChange();
-      if (this.onDidInitialize) {
-        this.onDidInitialize(this.branch);
-      }
+      this.onDidInitialize?.(this.branch);
     } else {
       this.git.onDidChangeState((state) => {
         if (state === "initialized") {
           this.branch = this.getBranch();
           this.listenToBranchChange();
-          if (this.onDidInitialize) {
-            this.onDidInitialize(this.branch);
-          }
+          this.onDidInitialize?.(this.branch);
         }
       });
     }
@@ -52,20 +48,16 @@ export default class GitProvider {
   }
 
   private listenToBranchChange() {
-    this.git.repositories[0].state.onDidChange(() => {
+    this.git.repositories[0]?.state.onDidChange(() => {
       const newBranch = this.getBranch();
       if (newBranch !== this.branch) {
         this.branch = newBranch;
-        if (this.onDidChangeBranch) {
-          this.onDidChangeBranch(this.branch);
-        }
+        this.onDidChangeBranch?.(this.branch);
       }
     });
   }
 
   private getBranch(): string | undefined {
-    if (this.git && this.git.repositories[0] && this.git.repositories[0].state.HEAD) {
-      return this.git.repositories[0].state.HEAD.name;
-    }
+    return this.git.repositories[0]?.state.HEAD?.name;
   }
 }

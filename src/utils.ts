@@ -1,12 +1,12 @@
 import { TextDocument, window } from "vscode";
-import KeepContext from ".";
+import { Task } from "./typings/KeepContext";
 
 /**
  * Returns an empty task structure.
  *
  * @param name Task name.
  */
-export function createTask(name: string): KeepContext.Task {
+export function createTask(name: string): Task {
   return {
     files: [],
     id: `task-${name}`,

@@ -1,5 +1,5 @@
-import KeepContext from ".";
 import { Memento } from "vscode";
+import { Task } from "./typings/KeepContext";
 
 /**
  * State
@@ -29,14 +29,14 @@ export default class State {
   /**
    * Get the task list
    */
-  get tasks(): { [name: string]: KeepContext.Task } {
+  get tasks(): { [name: string]: Task } {
     return this.workspaceState.get("tasks", {});
   }
 
   /**
    * Set the task list
    */
-  set tasks(tasks: { [name: string]: KeepContext.Task }) {
+  set tasks(tasks: { [name: string]: Task }) {
     this.workspaceState.update("tasks", tasks);
   }
 }

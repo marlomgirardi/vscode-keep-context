@@ -41,17 +41,8 @@ export class ContextTreeItem extends TreeItem {
       dark: path.join(imagesPath, "dark", taskIcon),
       light: path.join(imagesPath, "light", taskIcon),
     };
-  }
 
-  /** @override */
-  get tooltip(): string {
-    let tooltip = this.label;
-
-    if (this.active) {
-      tooltip += " (Active)";
-    }
-
-    return tooltip;
+    this.tooltip = this.getTooltip();
   }
 
   /**
@@ -74,5 +65,18 @@ export class ContextTreeItem extends TreeItem {
         },
       );
     });
+  }
+
+  /**
+   * Get tooltip for the Tree Item.
+   */
+  private getTooltip(): string {
+    let tooltip = this.label;
+
+    if (this.active) {
+      tooltip += " (Active)";
+    }
+
+    return tooltip;
   }
 }

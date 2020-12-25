@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import KeepContext from "./KeepContext";
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
   const keepContext = new KeepContext(context);
 
   vscode.window.registerTreeDataProvider("keepContext", keepContext.treeDataProvider);
@@ -16,4 +16,5 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(keepContext.statusBarItem);
 }
 
-export function deactivate() {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export function deactivate(): void {}
