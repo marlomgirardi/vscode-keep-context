@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Add task keybinding (Cmd+K Cmd+Shift+C).
+
 ### Fixes
 - Replace 'get' by 'update' on workspace method used on State.
 
