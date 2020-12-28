@@ -1,5 +1,5 @@
 import { QuickPickItem } from "vscode";
-import { Task } from "./typings/KeepContext";
+import Task from "./Task";
 
 /**
  * QuickPickTask

@@ -1,7 +1,5 @@
 import { EventEmitter, TreeDataProvider, TreeItem } from "vscode";
-
 import { ContextTreeItem } from "./ContextTreeItem";
-import State from "./State";
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
   /**
@@ -12,8 +10,6 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
   /** @override */
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
-  constructor(readonly state: State) {}
-
   /** @override */
   getTreeItem = (element: ContextTreeItem): TreeItem => element;
 
@@ -21,7 +17,7 @@ export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem
   getChildren(element?: ContextTreeItem): Thenable<ContextTreeItem[]> {
     // first level of the tree
     if (!element) {
-      return Promise.resolve(ContextTreeItem.fromState(this.state));
+      return Promise.resolve(ContextTreeItem.fromState());
     }
 
     return Promise.resolve([]);

@@ -1,4 +1,4 @@
-export interface Task {
+export default interface Task {
   /**
    * Task ID.
    */

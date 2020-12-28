@@ -1,5 +1,7 @@
 import { Memento } from "vscode";
-import { Task } from "./typings/KeepContext";
+import Task from "./Task";
+
+let _state: State;
 
 /**
  * State
@@ -10,7 +12,21 @@ export default class State {
   /**
    * @param workspaceState Storage from extension context.
    */
-  constructor(readonly workspaceState: Memento) {}
+  private constructor(readonly workspaceState: Memento) {}
+
+  /**
+   * @param workspaceState Storage from extension context.
+   */
+  static setupState(workspaceState: Memento): void {
+    _state = new State(workspaceState);
+  }
+
+  /**
+   * Get singleton instance of state.
+   */
+  static getInstance(): State {
+    return _state;
+  }
 
   /**
    * Get the active task.

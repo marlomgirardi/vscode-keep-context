@@ -1,15 +1,5 @@
 import * as fs from "fs";
-import {
-  commands,
-  ExtensionContext,
-  StatusBarAlignment,
-  StatusBarItem,
-  TextDocument,
-  Uri,
-  ViewColumn,
-  window,
-  workspace,
-} from "vscode";
+import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from "vscode";
 
 import { ContextTreeDataProvider } from "./ContextTreeDataProvider";
 import { ContextTreeItem } from "./ContextTreeItem";
@@ -17,6 +7,7 @@ import GitProvider from "./GitProvider";
 import { createTask, getRealFileName, taskInputBox } from "./utils";
 import State from "./State";
 import { QuickPickTask } from "./QuickPickTask";
+import { clearStatusBar, updateStatusBar } from "./statusbar";
 
 /**
  * Built in VS Code commands.
@@ -51,7 +42,7 @@ export default class KeepContext {
    */
   private git: GitProvider;
 
-  constructor(readonly context: ExtensionContext) {
+  constructor() {
     if (!workspace.workspaceFolders) {
       throw new Error("A workspace is required to run Keep Context.");
     }
@@ -60,14 +51,15 @@ export default class KeepContext {
     this.git.onDidChangeBranch = this.onBranchChange;
     this.git.onDidInitialize = this.onGitInitialize;
 
-    this.state = new State(context.workspaceState);
-    this.treeDataProvider = new ContextTreeDataProvider(this.state);
+    this.state = State.getInstance();
+    this.treeDataProvider = new ContextTreeDataProvider();
 
-    if (this.state.activeTask) {
-      const task = this.state.tasks[this.state.activeTask];
+    const activeTask = this.state.activeTask;
+    if (activeTask) {
+      const task = this.state.tasks[activeTask];
 
       if (task) {
-        this.updateStatusBar(task.name);
+        updateStatusBar(task.name);
       } else {
         this.state.activeTask = null;
         this.treeDataProvider.refresh();
@@ -84,19 +76,20 @@ export default class KeepContext {
         return;
       }
 
+      const tasks = this.state.tasks;
       const task = createTask(taskName);
 
       task.branch = this.git.branch;
 
       // TODO: Add opened files to the current task?
 
-      if (this.state.tasks[task.id]) {
+      if (tasks[task.id]) {
         window.showErrorMessage(`A task with name "${taskName}" already exists.`);
         return;
       }
 
       this.state.tasks = {
-        ...this.state.tasks,
+        ...tasks,
         [task.id]: task,
       };
 
@@ -116,12 +109,13 @@ export default class KeepContext {
       return;
     }
 
-    const selectedTask = this.state.tasks[taskId];
+    const tasks = this.state.tasks;
+    const selectedTask = tasks[taskId];
 
     taskInputBox(selectedTask.name, (value) => {
       const newTask = createTask(value);
 
-      if (value !== selectedTask.name && this.state.tasks[newTask.id]) {
+      if (value !== selectedTask.name && tasks[newTask.id]) {
         return `A task with name "${value}" already exists.`;
       }
 
@@ -132,8 +126,8 @@ export default class KeepContext {
 
         newTask.files = [...selectedTask.files];
 
-        this.state.tasks[newTask.id] = newTask;
-        delete this.state.tasks[selectedTask.id];
+        tasks[newTask.id] = newTask;
+        delete tasks[selectedTask.id];
 
         // TODO: Do we really need sort?
         // If yes, a better one should be used.
@@ -165,7 +159,7 @@ export default class KeepContext {
       if (this.state.activeTask === taskId) {
         this.state.activeTask = null;
 
-        this.updateStatusBar();
+        clearStatusBar();
 
         commands.executeCommand(BuiltInCommands.CloseAllEditors);
 
@@ -207,7 +201,7 @@ export default class KeepContext {
           this.git.setBranch(task.branch);
         }
 
-        this.updateStatusBar(task.name);
+        updateStatusBar(task.name);
 
         task.files
           .filter((file) => {
@@ -290,20 +284,6 @@ export default class KeepContext {
       }
     }
   };
-
-  /**
-   * Show new text in the status bar.
-   * @param text Status bar item text
-   */
-  updateStatusBar(text?: string): void {
-    if (text) {
-      this.statusBarItem.text = "$(tasklist) " + text;
-      this.statusBarItem.show();
-    } else {
-      this.statusBarItem.text = "";
-      this.statusBarItem.hide();
-    }
-  }
 
   /**
    * Handles the branch change.

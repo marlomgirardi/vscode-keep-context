@@ -50,20 +50,14 @@ export class ContextTreeItem extends TreeItem {
    *
    * @param state Extension state
    */
-  static fromState(state: State): ContextTreeItem[] {
+  static fromState(): ContextTreeItem[] {
+    const state = State.getInstance();
     return Object.values(state.tasks).map((task) => {
-      return new ContextTreeItem(
-        task.id,
-        task.name,
-        state.activeTask === task.id,
-        Contexts.TASK,
-        TreeItemCollapsibleState.None,
-        {
-          arguments: [task.id],
-          command: "keepContext.activateTask",
-          title: "",
-        },
-      );
+      return new ContextTreeItem(task.id, task.name, task.isActive, Contexts.TASK, TreeItemCollapsibleState.None, {
+        arguments: [task.id],
+        command: "keepContext.activateTask",
+        title: "",
+      });
     });
   }
 
