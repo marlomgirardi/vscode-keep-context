@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import KeepContext from "./KeepContext";
 import State from "./State";
+import { getRealFileName } from "./utils";
 
 export function activate(context: vscode.ExtensionContext): void {
   State.setupState(context.workspaceState);
@@ -16,6 +17,27 @@ export function activate(context: vscode.ExtensionContext): void {
 
   vscode.workspace.onDidOpenTextDocument(keepContext.addFile);
   vscode.workspace.onDidCloseTextDocument(keepContext.removeFile);
+  vscode.window.onDidChangeTextEditorViewColumn((textEditor: vscode.TextEditorViewColumnChangeEvent) => {
+    const state = State.getInstance();
+    debugger;
+  });
+  vscode.window.onDidChangeVisibleTextEditors((textEditors: vscode.TextEditor[]) => {
+    const state = State.getInstance();
+
+    if (state.activeTask) {
+      const task = state.tasks[state.activeTask];
+
+      textEditors.forEach(({ document, viewColumn }) => {
+        task.files = task.files.map((file) => {
+          if (file.path === getRealFileName(document)) {
+            file.viewColumn = viewColumn;
+          }
+          return file;
+        });
+      });
+      debugger;
+    }
+  });
 
   context.subscriptions.push(keepContext.statusBarItem);
 }

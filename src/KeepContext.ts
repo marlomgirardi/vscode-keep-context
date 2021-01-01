@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from "vscode";
+import { commands, StatusBarAlignment, StatusBarItem, TextDocument, ViewColumn, Uri, window, workspace } from "vscode";
 
 import { ContextTreeDataProvider } from "./ContextTreeDataProvider";
 import { ContextTreeItem } from "./ContextTreeItem";
@@ -16,6 +16,7 @@ import { clearStatusBar, updateStatusBar } from "./statusbar";
  */
 export enum BuiltInCommands {
   CloseAllEditors = "workbench.action.closeAllEditors",
+  SetEditorLayout = "vscode.setEditorLayout",
 }
 
 /**
@@ -205,22 +206,22 @@ export default class KeepContext {
 
         task.files
           .filter((file) => {
-            const hasFile = fs.existsSync(file);
-            if (!hasFile) filesNotFound.push(file);
+            const hasFile = fs.existsSync(file.path);
+            if (!hasFile) filesNotFound.push(file.path);
             return hasFile;
           })
-          .map(Uri.file)
           .forEach((file) =>
-            window.showTextDocument(file, {
-              viewColumn: ViewColumn.Active,
+            window.showTextDocument(Uri.file(file.path), {
+              viewColumn: file.viewColumn,
               preview: false,
             }),
           );
 
         if (filesNotFound.length > 0) {
-          task.files = task.files.filter((file) => !filesNotFound.includes(file));
+          task.files = task.files.filter((file) => !filesNotFound.includes(file.path));
           window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
         }
+
         this.treeDataProvider.refresh();
       });
     }
@@ -259,8 +260,11 @@ export default class KeepContext {
     if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
       const task = this.state.tasks[activeTask];
 
-      if (!task.files.includes(fileName)) {
-        task.files.push(fileName);
+      if (!task.files.find((file) => file.path === fileName)) {
+        this.state.tasks[activeTask].files.push({
+          path: fileName,
+          viewColumn: window.activeTextEditor?.viewColumn ?? ViewColumn.Active,
+        });
         this.treeDataProvider.refresh();
       }
     }
@@ -278,7 +282,7 @@ export default class KeepContext {
 
       if (haveBeenRemoved) {
         const task = this.state.tasks[activeTask];
-        task.files = task.files.filter((file: string) => file !== fileName);
+        task.files = task.files.filter((file) => file.path !== fileName);
 
         this.treeDataProvider.refresh();
       }
