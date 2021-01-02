@@ -291,8 +291,7 @@ export default class KeepContext {
    */
   private onBranchChange = (branch?: string) => {
     if (this.state.activeTask) {
-      const task = this.state.tasks[this.state.activeTask];
-      task.branch = branch;
+      this.state.tasks[this.state.activeTask].branch = branch;
     }
   };
 
@@ -305,7 +304,7 @@ export default class KeepContext {
       if (task.branch) {
         this.git.setBranch(task.branch);
       } else {
-        task.branch = this.git.branch;
+        this.state.tasks[this.state.activeTask].branch = this.git.branch;
       }
     }
   };
