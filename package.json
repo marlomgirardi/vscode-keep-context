@@ -2,7 +2,7 @@
   "name": "keep-context",
   "displayName": "Keep Context",
   "description": "Make context switch easy to be managed and tracked.",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
@@ -18,14 +18,14 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "configuration": {
-    }, 
+    "configuration": {},
     "keybindings": [
       {
         "key": "ctrl+k ctrl+shift+c",
         "mac": "cmd+k cmd+shift+c",
         "command": "keepContext.newTask"
-      }, {
+      },
+      {
         "key": "ctrl+k ctrl+shift+s",
         "mac": "cmd+k cmd+shift+s",
         "command": "keepContext.selectTask"
@@ -75,9 +75,15 @@
     ],
     "menus": {
       "commandPalette": [
-        { "command": "keepContext.newTask" },
-        { "command": "keepContext.editTask" },
-        { "command": "keepContext.deleteTask" }
+        {
+          "command": "keepContext.newTask"
+        },
+        {
+          "command": "keepContext.editTask"
+        },
+        {
+          "command": "keepContext.deleteTask"
+        }
       ],
       "view/title": [
         {
