@@ -71,21 +71,39 @@ export default class KeepContext {
    * New task handler.
    */
   newTask = (): void => {
-    taskInputBox().then((taskName) => {
+    taskInputBox().then(async (taskName) => {
       if (!taskName) {
         return;
       }
 
       const tasks = this.state.tasks;
       const task = createTask(taskName);
+      let keepFilesOpened = false;
 
       task.branch = this.git.branch;
-
-      // TODO: Add opened files to the current task?
 
       if (tasks[task.id]) {
         window.showErrorMessage(`A task with name "${taskName}" already exists.`);
         return;
+      }
+
+      const fileNames = workspace.textDocuments
+        .map(getRealFileName)
+        .filter((value) => typeof value === "string") as string[];
+
+      if (!this.state.activeTask && fileNames.length > 0) {
+        keepFilesOpened = await window
+          .showInformationMessage("Keep files opened?", "Yes", "No")
+          .then((selected) => selected === "Yes");
+      }
+
+      if (keepFilesOpened) {
+        task.files = fileNames.reduce((acc: string[], fileName: string) => {
+          if (!acc.includes(fileName)) {
+            acc = [...acc, fileName];
+          }
+          return acc;
+        }, []);
       }
 
       this.state.tasks = {
@@ -93,7 +111,7 @@ export default class KeepContext {
         [task.id]: task,
       };
 
-      this.activateTask(task.id);
+      this.activateTask(task.id, keepFilesOpened);
     });
   };
 
@@ -186,12 +204,18 @@ export default class KeepContext {
   /**
    * Activate task handler.
    */
-  activateTask = (taskId: string): void => {
+  activateTask = (taskId: string, keepFilesOpened = false): void => {
     if (this.state.activeTask !== taskId) {
       // TODO: use dirty state to prevent saving?
       this.state.activeTask = null;
 
-      commands.executeCommand(BuiltInCommands.CloseAllEditors).then(() => {
+      let promise: Thenable<void | undefined> = Promise.resolve();
+
+      if (!keepFilesOpened) {
+        promise = commands.executeCommand(BuiltInCommands.CloseAllEditors);
+      }
+
+      promise.then(() => {
         this.state.activeTask = taskId;
 
         const filesNotFound: Array<string> = [];
@@ -203,24 +227,27 @@ export default class KeepContext {
 
         updateStatusBar(task.name);
 
-        task.files
-          .filter((file) => {
-            const hasFile = fs.existsSync(file);
-            if (!hasFile) filesNotFound.push(file);
-            return hasFile;
-          })
-          .map(Uri.file)
-          .forEach((file) =>
-            window.showTextDocument(file, {
-              viewColumn: ViewColumn.Active,
-              preview: false,
-            }),
-          );
+        if (!keepFilesOpened) {
+          task.files
+            .filter((file) => {
+              const hasFile = fs.existsSync(file);
+              if (!hasFile) filesNotFound.push(file);
+              return hasFile;
+            })
+            .map(Uri.file)
+            .forEach((file) =>
+              window.showTextDocument(file, {
+                viewColumn: ViewColumn.Active,
+                preview: false,
+              }),
+            );
 
-        if (filesNotFound.length > 0) {
-          task.files = task.files.filter((file) => !filesNotFound.includes(file));
-          window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
+          if (filesNotFound.length > 0) {
+            task.files = task.files.filter((file) => !filesNotFound.includes(file));
+            window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
+          }
         }
+
         this.treeDataProvider.refresh();
       });
     }

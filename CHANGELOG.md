@@ -11,12 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add task keybinding (Cmd+K Cmd+Shift+C).
 - Select task keybinding (Cmd+K Cmd+Shift+S).
+- Ask to add files when no task is active (#8)
 
 ### Fixes
 - Replace 'get' by 'update' on workspace method used on State.
 
 ### Security
 - Upgrade mocha to remove 'Prototype Pollution' from a dependency.
+- Upgrade y18n and lodash due to `npm audit` recommendations.
 
 ### Breaking changes
 - The state of the extension is now saved in the reserved space by VS Code. `keep-context.json` will not be created.
