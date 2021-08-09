@@ -68,6 +68,24 @@ export default class KeepContext {
   }
 
   /**
+   * Clear keep context state
+   */
+  clearState = (): void => {
+    window
+      .showInformationMessage(
+        "All tasks will be removed forever, are you sure you want to clean the state?",
+        "Yes",
+        "No",
+      )
+      .then((selected) => {
+        if (selected === "Yes") {
+          this.state.clear();
+          this.treeDataProvider.refresh();
+        }
+      });
+  };
+
+  /**
    * New task handler.
    */
   newTask = (): void => {

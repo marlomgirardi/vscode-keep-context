@@ -64,4 +64,9 @@ export default class State {
   set tasks(tasks: { [name: string]: Task }) {
     this.workspaceState.update("tasks", tasks);
   }
+
+  clear(): void {
+    this.workspaceState.update("activeTask", null);
+    this.workspaceState.update("tasks", {});
+  }
 }

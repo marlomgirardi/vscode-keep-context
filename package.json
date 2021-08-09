@@ -50,6 +50,11 @@
     },
     "commands": [
       {
+        "command": "keepContext.clearState",
+        "title": "Clear state",
+        "category": "Keep Context"
+      },
+      {
         "command": "keepContext.newTask",
         "title": "Create Task",
         "category": "Keep Context"
