@@ -8,6 +8,7 @@ import { createTask, getRealFileName, taskInputBox } from './utils';
 import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
+import Task from './Task';
 
 /**
  * Built in VS Code commands.
@@ -124,11 +125,7 @@ export default class KeepContext {
         }, []);
       }
 
-      this.state.tasks = {
-        ...tasks,
-        [task.id]: task,
-      };
-
+      this.state.addTask(task);
       this.activateTask(task.id, keepFilesOpened);
     });
   };
@@ -145,13 +142,13 @@ export default class KeepContext {
       return;
     }
 
-    const tasks = this.state.tasks;
-    const selectedTask = tasks[taskId];
+    const selectedTask = this.state.getTask(taskId) as Task;
 
     taskInputBox(selectedTask.name, (value) => {
       const newTask = createTask(value);
+      const existentTask = this.state.getTask(newTask.id);
 
-      if (value !== selectedTask.name && tasks[newTask.id]) {
+      if (value !== selectedTask.name && existentTask) {
         return `A task with name "${value}" already exists.`;
       }
 
@@ -162,17 +159,8 @@ export default class KeepContext {
 
         newTask.files = [...selectedTask.files];
 
-        tasks[newTask.id] = newTask;
-        delete tasks[selectedTask.id];
-
-        // TODO: Do we really need sort?
-        // If yes, a better one should be used.
-        // this.state.tasks = Object.keys(this.state.tasks)
-        //   .sort()
-        //   .reduce((tasks: { [id: string]: KeepContext.Task }, taskId: string) => {
-        //     tasks[taskId] = this.state.tasks[taskId];
-        //     return tasks;
-        //   }, {});
+        this.state.addTask(newTask);
+        this.state.removeTask(selectedTask);
 
         this.activateTask(newTask.id);
       }
@@ -237,7 +225,7 @@ export default class KeepContext {
         this.state.activeTask = taskId;
 
         const filesNotFound: Array<string> = [];
-        const task = this.state.tasks[taskId];
+        const task = this.state.getTask(taskId) as Task;
 
         if (task.branch) {
           this.git.setBranch(task.branch);
@@ -298,14 +286,17 @@ export default class KeepContext {
    * Add file to the activated task
    */
   addFile = (document: TextDocument): void => {
-    const activeTask = this.state.activeTask;
+    if (!this.state.activeTask) {
+      return;
+    }
+
+    const task = this.state.getTask(this.state.activeTask);
     const fileName = getRealFileName(document);
 
-    if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
-      const task = this.state.tasks[activeTask];
-
+    if (fileName && task) {
       if (!task.files.includes(fileName)) {
         task.files.push(fileName);
+        this.state.updateTask(task);
         this.treeDataProvider.refresh();
       }
     }
@@ -315,18 +306,17 @@ export default class KeepContext {
    * Remove file from the activated task
    */
   removeFile = (document: TextDocument): void => {
-    const activeTask = this.state.activeTask;
+    if (!this.state.activeTask) {
+      return;
+    }
+
+    const task = this.state.getTask(this.state.activeTask);
     const fileName = getRealFileName(document);
 
-    if (fileName && activeTask !== null && this.state.tasks[activeTask]) {
-      const haveBeenRemoved = !workspace.textDocuments.map((textDoc) => textDoc.fileName).includes(fileName);
-
-      if (haveBeenRemoved) {
-        const task = this.state.tasks[activeTask];
-        task.files = task.files.filter((file: string) => file !== fileName);
-
-        this.treeDataProvider.refresh();
-      }
+    if (fileName && task) {
+      task.files = task.files.filter((file: string) => file !== fileName);
+      this.state.updateTask(task);
+      this.treeDataProvider.refresh();
     }
   };
 

@@ -58,11 +58,37 @@ export default class State {
     return this.workspaceState.get('tasks', {});
   }
 
-  /**
-   * Set the task list
-   */
-  set tasks(tasks: { [name: string]: Task }) {
+  getTask(taskId: string): Task | null {
+    const task = this.tasks[taskId];
+
+    if (!task) {
+      return null;
+    }
+
+    return {
+      ...task,
+      files: [...task.files],
+    };
+  }
+
+  addTask(task: Task): void {
+    const tasks = this.tasks;
+
+    this.workspaceState.update('tasks', {
+      ...tasks,
+      [task.id]: task,
+    });
+  }
+
+  removeTask(task: Task): void {
+    const tasks = { ...this.tasks };
+    delete tasks[task.id];
+
     this.workspaceState.update('tasks', tasks);
+  }
+
+  updateTask(task: Task): void {
+    this.addTask(task);
   }
 
   clear(): void {

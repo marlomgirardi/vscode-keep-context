@@ -71,5 +71,9 @@ export function getRealFileName(document: TextDocument): string | false {
     fileName = document.fileName;
   }
 
+  if (document.uri.scheme === 'git') {
+    fileName = document.fileName.replace(/\.git$/, '');
+  }
+
   return fileName;
 }
