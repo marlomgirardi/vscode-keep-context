@@ -8,7 +8,7 @@ import { createTask, getAllOpenedFiles, taskInputBox } from './utils';
 import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
-import Task from './Task';
+import Task, { File } from './Task';
 import logger from './logger';
 
 /**
@@ -18,6 +18,7 @@ import logger from './logger';
  */
 export enum BuiltInCommands {
   CloseAllEditors = 'workbench.action.closeAllEditors',
+  SetEditorLayout = 'vscode.setEditorLayout',
 }
 
 /**
@@ -108,6 +109,7 @@ export default class KeepContext {
       }
 
       const fileNames = getAllOpenedFiles();
+      // const files = workspace.textDocuments.filter((doc) => doc.uri.scheme === 'file');
 
       if (!this.state.activeTask && fileNames.length > 0) {
         keepFilesOpened = await window
@@ -117,6 +119,10 @@ export default class KeepContext {
 
       if (keepFilesOpened) {
         task.files = fileNames;
+        // task.files = files.map<File>((doc) => ({
+        //   path: doc.uri.fsPath,
+        //   viewColumn: window.activeTextEditor?.viewColumn ?? ViewColumn.Active,
+        // }));
       }
 
       this.state.addTask(task);
@@ -235,6 +241,8 @@ export default class KeepContext {
         if (!keepFilesOpened) {
           task.files
             .filter((file) => {
+              // const hasFile = fs.existsSync(file.path);
+              // if (!hasFile) filesNotFound.push(file.path);
               const hasFile = fs.existsSync(file);
               if (!hasFile) filesNotFound.push(file);
               return hasFile;
@@ -305,6 +313,16 @@ export default class KeepContext {
     if (!task) return;
 
     task.files = files;
+
+    // if (!task.files.find((file) => file.path === fileName)) {
+    //   task.files.push({
+    //     path: fileName,
+    //     viewColumn: window.activeTextEditor?.viewColumn ?? ViewColumn.Active,
+    //   });
+    //   this.state.updateTask(task);
+    //   this.treeDataProvider.refresh();
+    // }
+
     this.state.updateTask(task);
     this.treeDataProvider.refresh();
   };
