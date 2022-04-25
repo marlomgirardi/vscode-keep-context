@@ -1,5 +1,5 @@
-import { QuickPickItem } from "vscode";
-import Task from "./Task";
+import { QuickPickItem } from 'vscode';
+import Task from './Task';
 
 /**
  * QuickPickTask
@@ -9,12 +9,12 @@ import Task from "./Task";
 export class QuickPickTask implements QuickPickItem {
   label: string;
   description?: string | undefined;
-  id: Task["id"];
+  id: Task['id'];
 
-  constructor(label: string, taskId: Task["id"], isActive: boolean) {
+  constructor(label: string, taskId: Task['id'], isActive: boolean) {
     this.label = label;
     this.id = taskId;
-    this.description = isActive ? "$(check) Active" : "";
+    this.description = isActive ? '$(check) Active' : '';
   }
 
   static fromTask(task: Task): QuickPickTask {

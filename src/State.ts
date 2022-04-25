@@ -1,5 +1,5 @@
-import { Memento } from "vscode";
-import Task from "./Task";
+import { Memento } from 'vscode';
+import Task from './Task';
 
 let _state: State;
 
@@ -32,7 +32,7 @@ export default class State {
    * Get the active task.
    */
   get activeTask(): string | null {
-    return this.workspaceState.get("activeTask", null);
+    return this.workspaceState.get('activeTask', null);
   }
 
   /**
@@ -48,25 +48,25 @@ export default class State {
       this.tasks[taskId].isActive = true;
     }
 
-    this.workspaceState.update("activeTask", taskId);
+    this.workspaceState.update('activeTask', taskId);
   }
 
   /**
    * Get the task list
    */
   get tasks(): { [name: string]: Task } {
-    return this.workspaceState.get("tasks", {});
+    return this.workspaceState.get('tasks', {});
   }
 
   /**
    * Set the task list
    */
   set tasks(tasks: { [name: string]: Task }) {
-    this.workspaceState.update("tasks", tasks);
+    this.workspaceState.update('tasks', tasks);
   }
 
   clear(): void {
-    this.workspaceState.update("activeTask", null);
-    this.workspaceState.update("tasks", {});
+    this.workspaceState.update('activeTask', null);
+    this.workspaceState.update('tasks', {});
   }
 }

@@ -1,5 +1,5 @@
-import { EventEmitter, TreeDataProvider, TreeItem } from "vscode";
-import { ContextTreeItem } from "./ContextTreeItem";
+import { EventEmitter, TreeDataProvider, TreeItem } from 'vscode';
+import { ContextTreeItem } from './ContextTreeItem';
 
 export class ContextTreeDataProvider implements TreeDataProvider<ContextTreeItem> {
   /**

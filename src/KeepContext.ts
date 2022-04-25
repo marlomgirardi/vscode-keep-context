@@ -1,13 +1,13 @@
-import * as fs from "fs";
-import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from "vscode";
+import * as fs from 'fs';
+import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from 'vscode';
 
-import { ContextTreeDataProvider } from "./ContextTreeDataProvider";
-import { ContextTreeItem } from "./ContextTreeItem";
-import GitProvider from "./GitProvider";
-import { createTask, getRealFileName, taskInputBox } from "./utils";
-import State from "./State";
-import { QuickPickTask } from "./QuickPickTask";
-import { clearStatusBar, updateStatusBar } from "./statusbar";
+import { ContextTreeDataProvider } from './ContextTreeDataProvider';
+import { ContextTreeItem } from './ContextTreeItem';
+import GitProvider from './GitProvider';
+import { createTask, getRealFileName, taskInputBox } from './utils';
+import State from './State';
+import { QuickPickTask } from './QuickPickTask';
+import { clearStatusBar, updateStatusBar } from './statusbar';
 
 /**
  * Built in VS Code commands.
@@ -15,7 +15,7 @@ import { clearStatusBar, updateStatusBar } from "./statusbar";
  * https://code.visualstudio.com/docs/getstarted/keybindings#_basic-editing
  */
 export enum BuiltInCommands {
-  CloseAllEditors = "workbench.action.closeAllEditors",
+  CloseAllEditors = 'workbench.action.closeAllEditors',
 }
 
 /**
@@ -44,7 +44,7 @@ export default class KeepContext {
 
   constructor() {
     if (!workspace.workspaceFolders) {
-      throw new Error("A workspace is required to run Keep Context.");
+      throw new Error('A workspace is required to run Keep Context.');
     }
 
     this.git = new GitProvider();
@@ -73,12 +73,12 @@ export default class KeepContext {
   clearState = (): void => {
     window
       .showInformationMessage(
-        "All tasks will be removed forever, are you sure you want to clean the state?",
-        "Yes",
-        "No",
+        'All tasks will be removed forever, are you sure you want to clean the state?',
+        'Yes',
+        'No',
       )
       .then((selected) => {
-        if (selected === "Yes") {
+        if (selected === 'Yes') {
           this.state.clear();
           this.treeDataProvider.refresh();
         }
@@ -107,12 +107,12 @@ export default class KeepContext {
 
       const fileNames = workspace.textDocuments
         .map(getRealFileName)
-        .filter((value) => typeof value === "string") as string[];
+        .filter((value) => typeof value === 'string') as string[];
 
       if (!this.state.activeTask && fileNames.length > 0) {
         keepFilesOpened = await window
-          .showInformationMessage("Keep files opened?", "Yes", "No")
-          .then((selected) => selected === "Yes");
+          .showInformationMessage('Keep files opened?', 'Yes', 'No')
+          .then((selected) => selected === 'Yes');
       }
 
       if (keepFilesOpened) {
@@ -141,7 +141,7 @@ export default class KeepContext {
     const taskId = task?.id || this.state.activeTask;
 
     if (!taskId) {
-      window.showWarningMessage("You must select a task to edit.");
+      window.showWarningMessage('You must select a task to edit.');
       return;
     }
 
@@ -187,7 +187,7 @@ export default class KeepContext {
     const taskId = task?.id || this.state.activeTask;
 
     if (!taskId) {
-      window.showWarningMessage("You must select a task to remove.");
+      window.showWarningMessage('You must select a task to remove.');
       return;
     }
 
@@ -262,7 +262,7 @@ export default class KeepContext {
 
           if (filesNotFound.length > 0) {
             task.files = task.files.filter((file) => !filesNotFound.includes(file));
-            window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join("\n")}`);
+            window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join('\n')}`);
           }
         }
 
@@ -274,11 +274,11 @@ export default class KeepContext {
   selectTask = (): void => {
     const input = window.createQuickPick<QuickPickTask>();
 
-    input.placeholder = "Select a task to activate";
+    input.placeholder = 'Select a task to activate';
     input.items = Object.values(this.state.tasks).map(QuickPickTask.fromTask);
 
     if (input.items.length === 0) {
-      window.showWarningMessage("No task is available for selection");
+      window.showWarningMessage('No task is available for selection');
       input.dispose();
       return;
     }

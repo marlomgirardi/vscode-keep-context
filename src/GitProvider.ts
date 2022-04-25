@@ -1,5 +1,5 @@
-import { Extension, extensions } from "vscode";
-import * as Git from "./typings/git";
+import { Extension, extensions } from 'vscode';
+import * as Git from './typings/git';
 
 export default class GitProvider {
   branch?: string;
@@ -20,21 +20,21 @@ export default class GitProvider {
   private git: Git.API;
 
   constructor() {
-    const gitExtension: Extension<Git.GitExtension> | undefined = extensions.getExtension("vscode.git");
+    const gitExtension: Extension<Git.GitExtension> | undefined = extensions.getExtension('vscode.git');
 
     if (!gitExtension) {
-      throw new Error("Could not found the vscode.git extension");
+      throw new Error('Could not found the vscode.git extension');
     }
 
     this.git = gitExtension.exports.getAPI(1);
 
-    if (this.git.state === "initialized") {
+    if (this.git.state === 'initialized') {
       this.branch = this.getBranch();
       this.listenToBranchChange();
       this.onDidInitialize?.(this.branch);
     } else {
       this.git.onDidChangeState((state) => {
-        if (state === "initialized") {
+        if (state === 'initialized') {
           this.branch = this.getBranch();
           this.listenToBranchChange();
           this.onDidInitialize?.(this.branch);

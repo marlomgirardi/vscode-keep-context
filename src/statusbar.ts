@@ -1,4 +1,4 @@
-import { StatusBarAlignment, window, StatusBarItem } from "vscode";
+import { StatusBarAlignment, window, StatusBarItem } from 'vscode';
 
 /**
  * @private
@@ -14,7 +14,7 @@ export const getStatusBarItem = (): StatusBarItem => _statusBarItem;
  * Clear status bar item.
  */
 export function clearStatusBar(): void {
-  _statusBarItem.text = "";
+  _statusBarItem.text = '';
   _statusBarItem.hide();
 }
 
@@ -24,7 +24,7 @@ export function clearStatusBar(): void {
  */
 export function updateStatusBar(text?: string): void {
   if (text) {
-    _statusBarItem.text = "$(tasklist) " + text;
+    _statusBarItem.text = '$(tasklist) ' + text;
     _statusBarItem.show();
   } else {
     clearStatusBar();

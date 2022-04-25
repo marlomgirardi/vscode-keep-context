@@ -1,21 +1,21 @@
-import * as path from "path";
-import { Command, TreeItem, TreeItemCollapsibleState } from "vscode";
-import State from "./State";
+import * as path from 'path';
+import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
+import State from './State';
 
 /**
  * Contexts are used to create expressions to show/hide things.
  * They are used mostly in the package.json
  */
 export enum Contexts {
-  TASK = "task_item",
+  TASK = 'task_item',
 }
 
 /**
  * Icons used in the ContextTreeItem
  */
 export enum Icons {
-  TASK = "task.svg",
-  TASK_ACTIVE = "task-active.svg",
+  TASK = 'task.svg',
+  TASK_ACTIVE = 'task-active.svg',
 }
 
 /**
@@ -34,12 +34,12 @@ export class ContextTreeItem extends TreeItem {
   ) {
     super(label, collapsibleState);
 
-    const imagesPath = path.join(__filename, "..", "..", "images");
+    const imagesPath = path.join(__filename, '..', '..', 'images');
     const taskIcon = this.active ? Icons.TASK_ACTIVE : Icons.TASK;
 
     this.iconPath = {
-      dark: path.join(imagesPath, "dark", taskIcon),
-      light: path.join(imagesPath, "light", taskIcon),
+      dark: path.join(imagesPath, 'dark', taskIcon),
+      light: path.join(imagesPath, 'light', taskIcon),
     };
 
     this.tooltip = this.getTooltip();
@@ -55,8 +55,8 @@ export class ContextTreeItem extends TreeItem {
     return Object.values(state.tasks).map((task) => {
       return new ContextTreeItem(task.id, task.name, task.isActive, Contexts.TASK, TreeItemCollapsibleState.None, {
         arguments: [task.id],
-        command: "keepContext.activateTask",
-        title: "",
+        command: 'keepContext.activateTask',
+        title: '',
       });
     });
   }
@@ -68,7 +68,7 @@ export class ContextTreeItem extends TreeItem {
     let tooltip = this.label;
 
     if (this.active) {
-      tooltip += " (Active)";
+      tooltip += ' (Active)';
     }
 
     return tooltip;
