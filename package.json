@@ -6,7 +6,7 @@
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.66.2"
   },
   "license": "MIT",
   "categories": [
