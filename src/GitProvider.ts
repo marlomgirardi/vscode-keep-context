@@ -1,4 +1,5 @@
 import { Extension, extensions } from 'vscode';
+import logger from './logger';
 import * as Git from './typings/git';
 
 export default class GitProvider {
@@ -44,7 +45,11 @@ export default class GitProvider {
   }
 
   setBranch(branch: string): void {
-    this.git.repositories[0].checkout(branch);
+    if (this.branch === branch) return;
+    this.git.repositories[0]
+      .checkout(branch)
+      .then(() => (this.branch = branch))
+      .catch((e) => logger.error(`Error during checkout of branch "${branch}"`, e));
   }
 
   private listenToBranchChange() {

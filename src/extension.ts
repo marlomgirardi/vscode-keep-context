@@ -8,6 +8,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const keepContext = new KeepContext();
 
   vscode.window.registerTreeDataProvider('keepContext', keepContext.treeDataProvider);
+
   vscode.commands.registerCommand('keepContext.clearState', keepContext.clearState);
   vscode.commands.registerCommand('keepContext.newTask', keepContext.newTask);
   vscode.commands.registerCommand('keepContext.editTask', keepContext.editTask);

@@ -8,6 +8,7 @@ Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semv
 
 ## Unreleased
 - Upgrade all dependencies
+- 
 
 ## 0.2.0 - 2021-05-21
 

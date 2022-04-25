@@ -9,6 +9,7 @@ import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
 import Task from './Task';
+import logger from './logger';
 
 /**
  * Built in VS Code commands.
@@ -222,10 +223,15 @@ export default class KeepContext {
       }
 
       promise.then(() => {
-        this.state.activeTask = taskId;
-
+        const task = this.state.getTask(taskId);
         const filesNotFound: Array<string> = [];
-        const task = this.state.getTask(taskId) as Task;
+
+        if (!task) {
+          logger.error(`Task "${taskId}" not found.`);
+          return;
+        }
+
+        this.state.activeTask = taskId;
 
         if (task.branch) {
           this.git.setBranch(task.branch);
@@ -241,12 +247,16 @@ export default class KeepContext {
               return hasFile;
             })
             .map(Uri.file)
-            .forEach((file) =>
-              window.showTextDocument(file, {
-                viewColumn: ViewColumn.Active,
-                preview: false,
-              }),
-            );
+            .forEach((file) => {
+              window
+                .showTextDocument(file, {
+                  viewColumn: ViewColumn.Active,
+                  preview: false,
+                })
+                .then(undefined, (e) => {
+                  logger.error(`Error opening file "${file.path}"`, e);
+                });
+            });
 
           if (filesNotFound.length > 0) {
             task.files = task.files.filter((file) => !filesNotFound.includes(file));
