@@ -15,7 +15,7 @@ In a simple way you can:
 - Track opened files by task
 - Track git branch by task
 
-![Task management](images/docs/task-management.gif)
+![Task management](images/docs/app-screen-record.gif)
 
 ## Keybindings
 
@@ -25,6 +25,9 @@ In a simple way you can:
 ## Limitations
 
 - It may work in workspaces with more than one folder, but it only supports single folders.
+- Layouts cannot be restored properly https://github.com/microsoft/vscode/issues/88612
+- It doesn't store `TabInputTextDiff`, `TabInputWebview`, `TabInputNotebookDiff`, and `TabInputTerminal`.
+- Preview tabs are not stored.
 
 ## Known Issues
 

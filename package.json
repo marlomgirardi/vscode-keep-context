@@ -6,7 +6,7 @@
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
-    "vscode": "^1.66.2"
+    "vscode": "^1.72.0"
   },
   "license": "MIT",
   "categories": [
@@ -57,6 +57,11 @@
       {
         "command": "keepContext.newTask",
         "title": "Create Task",
+        "category": "Keep Context"
+      },
+      {
+        "command": "keepContext.selectTask",
+        "title": "Select Task",
         "category": "Keep Context"
       },
       {

@@ -1,4 +1,4 @@
-import { TextDocument, window } from 'vscode';
+import { Tab, TabInputCustom, TabInputNotebook, TabInputText, TextDocument, window } from 'vscode';
 import Task from './Task';
 
 /**
@@ -63,6 +63,7 @@ export function taskInputBox(
  * To avoid bugs, they should be treated as valid.
  *
  * @param document Text Document from VSCode.
+ * @deprecated Will be removed once the `TextDocument` is replaced by `Tab`
  */
 export function getRealFileName(document: TextDocument): string | false {
   let fileName: string | false = false;
@@ -77,3 +78,12 @@ export function getRealFileName(document: TextDocument): string | false {
 
   return fileName;
 }
+
+export function isTabSupported(tab: Tab) {
+  return (
+    tab.input instanceof TabInputText || tab.input instanceof TabInputCustom || tab.input instanceof TabInputNotebook
+  );
+}
+
+/** As the typescript do not evaluate `isTabSupported` and I don't want to spread it through the code. This will help */
+export type KeepContextTabInput = TabInputText | TabInputCustom | TabInputNotebook;

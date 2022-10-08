@@ -14,7 +14,7 @@ export class QuickPickTask implements QuickPickItem {
   constructor(label: string, taskId: Task['id'], isActive: boolean) {
     this.label = label;
     this.id = taskId;
-    this.description = isActive ? '$(check) Active' : '';
+    this.description = isActive ? '$(pass-filled) Active' : '';
   }
 
   static fromTask(task: Task): QuickPickTask {

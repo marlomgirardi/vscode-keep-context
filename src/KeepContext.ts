@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { commands, StatusBarAlignment, StatusBarItem, TextDocument, Uri, ViewColumn, window, workspace } from 'vscode';
+import { commands, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window, workspace } from 'vscode';
 
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
@@ -247,15 +247,23 @@ export default class KeepContext {
               return hasFile;
             })
             .map(Uri.file)
-            .forEach((file) => {
-              window
-                .showTextDocument(file, {
-                  viewColumn: ViewColumn.Active,
-                  preview: false,
-                })
-                .then(undefined, (e) => {
-                  logger.error(`Error opening file "${file.path}"`, e);
-                });
+            .forEach((file, idx) => {
+              workspace.openTextDocument(file).then(
+                (document) => {
+                  // when showing multiple documents there is a concurrency problem with the returned TextEditor
+                  // https://github.com/microsoft/vscode/issues/145969#issuecomment-1077788421
+                  setTimeout(() => {
+                    window
+                      .showTextDocument(document, {
+                        viewColumn: ViewColumn.Active,
+                        preview: false,
+                        preserveFocus: true,
+                      })
+                      .then(undefined, (e) => logger.error(`Error showing file "${file.path}"`, e));
+                  }, 80 * idx);
+                },
+                (e) => logger.error(`Error opening file "${file.path}"`, e),
+              );
             });
 
           if (filesNotFound.length > 0) {
@@ -268,6 +276,10 @@ export default class KeepContext {
       });
     }
   };
+
+  isTaskActive(): boolean {
+    return Boolean(this.state.activeTask && this.state.getTask(this.state.activeTask));
+  }
 
   selectTask = (): void => {
     const input = window.createQuickPick<QuickPickTask>();
@@ -292,42 +304,16 @@ export default class KeepContext {
     });
   };
 
-  /**
-   * Add file to the activated task
-   */
-  addFile = (document: TextDocument): void => {
-    if (!this.state.activeTask) {
-      return;
-    }
+  updateFileList = (files: string[]): void => {
+    if (!this.state.activeTask) return;
 
     const task = this.state.getTask(this.state.activeTask);
-    const fileName = getRealFileName(document);
 
-    if (fileName && task) {
-      if (!task.files.includes(fileName)) {
-        task.files.push(fileName);
-        this.state.updateTask(task);
-        this.treeDataProvider.refresh();
-      }
-    }
-  };
+    if (!task) return;
 
-  /**
-   * Remove file from the activated task
-   */
-  removeFile = (document: TextDocument): void => {
-    if (!this.state.activeTask) {
-      return;
-    }
-
-    const task = this.state.getTask(this.state.activeTask);
-    const fileName = getRealFileName(document);
-
-    if (fileName && task) {
-      task.files = task.files.filter((file: string) => file !== fileName);
-      this.state.updateTask(task);
-      this.treeDataProvider.refresh();
-    }
+    task.files = files;
+    this.state.updateTask(task);
+    this.treeDataProvider.refresh();
   };
 
   /**

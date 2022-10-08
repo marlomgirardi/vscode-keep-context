@@ -10,8 +10,7 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "stopOnEntry": false,
+      "args": ["--profile=keepContextEmpty", "--extensionDevelopmentPath=${workspaceFolder}"],
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "npm: watch"
@@ -22,10 +21,10 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--profile=keepContextSingleFolder",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/src/test/project-sample"
       ],
-      "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "npm: watch"
@@ -36,11 +35,11 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--profile=keepContextCleanSingleFolder",
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/src/test/project-sample"
       ],
-      "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "npm: watch"
@@ -51,11 +50,11 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--profile=keepContextCleanExternalFolder",
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/../vscode-keep-context-test"
       ],
-      "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "npm: watch"
