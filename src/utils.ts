@@ -1,4 +1,4 @@
-import { Tab, TabInputCustom, TabInputNotebook, TabInputText, TextDocument, window } from 'vscode';
+import { Tab, TabInputCustom, TabInputNotebook, TabInputText, window } from 'vscode';
 import Task from './Task';
 
 /**
@@ -58,26 +58,8 @@ export function taskInputBox(
   });
 }
 
-/**
- * Some times we receive a document with `uri.schema` equals `git` instead of `file`.
- * To avoid bugs, they should be treated as valid.
- *
- * @param document Text Document from VSCode.
- * @deprecated Will be removed once the `TextDocument` is replaced by `Tab`
- */
-export function getRealFileName(document: TextDocument): string | false {
-  let fileName: string | false = false;
-
-  if (document.uri.scheme === 'file') {
-    fileName = document.fileName;
-  }
-
-  if (document.uri.scheme === 'git') {
-    fileName = document.fileName.replace(/\.git$/, '');
-  }
-
-  return fileName;
-}
+/** As the typescript do not evaluate `isTabSupported` and I don't want to spread it through the code. This will help */
+type KeepContextTabInput = TabInputText | TabInputCustom | TabInputNotebook;
 
 export function isTabSupported(tab: Tab) {
   return (
@@ -85,5 +67,16 @@ export function isTabSupported(tab: Tab) {
   );
 }
 
-/** As the typescript do not evaluate `isTabSupported` and I don't want to spread it through the code. This will help */
-export type KeepContextTabInput = TabInputText | TabInputCustom | TabInputNotebook;
+/**
+ * Get a list of opened files supported by KeepContext.
+ */
+export function getAllOpenedFiles() {
+  return [
+    ...new Set(
+      window.tabGroups.all
+        .flatMap((group) => group.tabs)
+        .filter((tab) => !tab.isPreview && isTabSupported(tab))
+        .map(({ input }) => (input as KeepContextTabInput).uri.fsPath),
+    ),
+  ];
+}

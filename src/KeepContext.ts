@@ -4,7 +4,7 @@ import { commands, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window, w
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import GitProvider from './GitProvider';
-import { createTask, getRealFileName, taskInputBox } from './utils';
+import { createTask, getAllOpenedFiles, taskInputBox } from './utils';
 import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
@@ -107,9 +107,7 @@ export default class KeepContext {
         return;
       }
 
-      const fileNames = workspace.textDocuments
-        .map(getRealFileName)
-        .filter((value) => typeof value === 'string') as string[];
+      const fileNames = getAllOpenedFiles();
 
       if (!this.state.activeTask && fileNames.length > 0) {
         keepFilesOpened = await window
@@ -118,12 +116,7 @@ export default class KeepContext {
       }
 
       if (keepFilesOpened) {
-        task.files = fileNames.reduce((acc: string[], fileName: string) => {
-          if (!acc.includes(fileName)) {
-            acc = [...acc, fileName];
-          }
-          return acc;
-        }, []);
+        task.files = fileNames;
       }
 
       this.state.addTask(task);

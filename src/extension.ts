@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import KeepContext from './KeepContext';
 import State from './State';
-import { isTabSupported, KeepContextTabInput } from './utils';
+import { getAllOpenedFiles, isTabSupported } from './utils';
 
 export function activate(context: vscode.ExtensionContext): void {
   State.setupState(context.workspaceState);
@@ -24,15 +24,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const hasChanged = tabEvent.changed.some((tab) => !tab.isPreview && isTabSupported(tab));
 
     if ((hasClosed || hasOpened || hasChanged) && keepContext.isTaskActive()) {
-      const files = [
-        ...new Set(
-          vscode.window.tabGroups.all
-            .flatMap((group) => group.tabs)
-            .filter((tab) => !tab.isPreview && isTabSupported(tab))
-            .map(({ input }) => (input as KeepContextTabInput).uri.fsPath),
-        ),
-      ];
-
+      const files = getAllOpenedFiles();
       keepContext.updateFileList(files);
     }
   });
