@@ -8,6 +8,7 @@ Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semv
 
 ## Unreleased
 - Upgrade all dependencies
+- Update icons to use [vscode-codicon](https://microsoft.github.io/vscode-codicons/dist/codicon.html).
 - 
 
 ## 0.2.0 - 2021-05-21

@@ -73,8 +73,8 @@
         "title": "Delete Task",
         "category": "Keep Context",
         "icon": {
-          "light": "images/light/delete.svg",
-          "dark": "images/dark/delete.svg"
+          "light": "images/light/trash.svg",
+          "dark": "images/dark/trash.svg"
         }
       }
     ],
