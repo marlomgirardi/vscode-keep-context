@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { commands, StatusBarAlignment, StatusBarItem, Uri, ViewColumn, window, workspace } from 'vscode';
+import { commands, StatusBarAlignment, StatusBarItem, Uri, window, workspace } from 'vscode';
 
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
@@ -8,7 +8,7 @@ import { createTask, getAllOpenedFiles, taskInputBox } from './utils';
 import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
-import Task from './Task';
+import Task, { File } from './Task';
 import logger from './logger';
 
 /**
@@ -18,6 +18,7 @@ import logger from './logger';
  */
 export enum BuiltInCommands {
   CloseAllEditors = 'workbench.action.closeAllEditors',
+  SetEditorLayout = 'vscode.setEditorLayout',
 }
 
 /**
@@ -107,16 +108,16 @@ export default class KeepContext {
         return;
       }
 
-      const fileNames = getAllOpenedFiles();
+      const openFiles = getAllOpenedFiles();
 
-      if (!this.state.activeTask && fileNames.length > 0) {
+      if (!this.state.activeTask && openFiles.length > 0) {
         keepFilesOpened = await window
           .showInformationMessage('Keep files opened?', 'Yes', 'No')
           .then((selected) => selected === 'Yes');
       }
 
       if (keepFilesOpened) {
-        task.files = fileNames;
+        task.files = openFiles;
       }
 
       this.state.addTask(task);
@@ -235,20 +236,19 @@ export default class KeepContext {
         if (!keepFilesOpened) {
           task.files
             .filter((file) => {
-              const hasFile = fs.existsSync(file);
-              if (!hasFile) filesNotFound.push(file);
+              const hasFile = fs.existsSync(file.path);
+              if (!hasFile) filesNotFound.push(file.path);
               return hasFile;
             })
-            .map(Uri.file)
             .forEach((file, idx) => {
-              workspace.openTextDocument(file).then(
+              workspace.openTextDocument(Uri.file(file.path)).then(
                 (document) => {
                   // when showing multiple documents there is a concurrency problem with the returned TextEditor
                   // https://github.com/microsoft/vscode/issues/145969#issuecomment-1077788421
                   setTimeout(() => {
                     window
                       .showTextDocument(document, {
-                        viewColumn: ViewColumn.Active,
+                        viewColumn: file.viewColumn,
                         preview: false,
                         preserveFocus: true,
                       })
@@ -260,7 +260,7 @@ export default class KeepContext {
             });
 
           if (filesNotFound.length > 0) {
-            task.files = task.files.filter((file) => !filesNotFound.includes(file));
+            task.files = task.files.filter((file) => !filesNotFound.includes(file.path));
             window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join('\n')}`);
           }
         }
@@ -297,7 +297,7 @@ export default class KeepContext {
     });
   };
 
-  updateFileList = (files: string[]): void => {
+  updateFileList = (files: File[]): void => {
     if (!this.state.activeTask) return;
 
     const task = this.state.getTask(this.state.activeTask);
@@ -305,6 +305,7 @@ export default class KeepContext {
     if (!task) return;
 
     task.files = files;
+
     this.state.updateTask(task);
     this.treeDataProvider.refresh();
   };
