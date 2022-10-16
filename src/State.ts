@@ -58,17 +58,13 @@ export default class State {
     return this.workspaceState.get('tasks', {});
   }
 
+  /**
+   * Get a task by id
+   */
   getTask(taskId: string): Task | null {
     const task = this.tasks[taskId];
-
-    if (!task) {
-      return null;
-    }
-
-    return {
-      ...task,
-      files: [...task.files],
-    };
+    if (!task) return null;
+    return task;
   }
 
   addTask(task: Task): void {

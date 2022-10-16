@@ -11,6 +11,7 @@ With this extension you won't forget the files that you need to open to continue
 ### Task management
 
 In a simple way you can:
+
 - Create/edit/delete task
 - Track opened files by task
 - Track git branch by task
@@ -25,9 +26,17 @@ In a simple way you can:
 ## Limitations
 
 - It may work in workspaces with more than one folder, but it only supports single folders.
-- Layouts cannot be restored properly https://github.com/microsoft/vscode/issues/88612
 - It doesn't store `TabInputTextDiff`, `TabInputWebview`, `TabInputNotebookDiff`, and `TabInputTerminal`.
 - Preview tabs are not stored.
+
+### Layouts / Columns
+
+VS Code uses `viewColumn` property to know the `tabGroup` a `tab` belongs to. But there is no what to know or set exact
+position of the tab which only goes from `1` to `9`.
+
+So if you place one group at the top and other at the bottom, the api just provide `1` and `2`. The same applies if you
+add one group at left and other at right. So the only information we give back when opening tabs is to which group the
+tab belongs.
 
 ## Known Issues
 

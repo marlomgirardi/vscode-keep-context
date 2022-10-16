@@ -19,8 +19,7 @@ export default interface Task {
   /**
    * All the files opened in the editor while working in the task.
    */
-  files: string[];
-  // files: File[];
+  files: File[];
 
   /**
    * Branch attached to this task.

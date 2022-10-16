@@ -1,5 +1,5 @@
 import { Tab, TabInputCustom, TabInputNotebook, TabInputText, window } from 'vscode';
-import Task from './Task';
+import Task, { File } from './Task';
 
 /**
  * Returns an empty task structure.
@@ -70,13 +70,16 @@ export function isTabSupported(tab: Tab) {
 /**
  * Get a list of opened files supported by KeepContext.
  */
-export function getAllOpenedFiles() {
+export function getAllOpenedFiles(): File[] {
   return [
     ...new Set(
       window.tabGroups.all
         .flatMap((group) => group.tabs)
         .filter((tab) => !tab.isPreview && isTabSupported(tab))
-        .map(({ input }) => (input as KeepContextTabInput).uri.fsPath),
+        .map(({ input, group }) => ({
+          path: (input as KeepContextTabInput).uri.fsPath,
+          viewColumn: group.viewColumn,
+        })),
     ),
   ];
 }
