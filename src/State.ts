@@ -1,7 +1,5 @@
-import { Memento } from 'vscode';
+import { IStorage } from './Storage/IStorage';
 import Task from './Task';
-
-let _state: State;
 
 /**
  * State
@@ -9,30 +7,13 @@ let _state: State;
  * Manage the state used in the Keep Context.
  */
 export default class State {
-  /**
-   * @param workspaceState Storage from extension context.
-   */
-  private constructor(readonly workspaceState: Memento) {}
-
-  /**
-   * @param workspaceState Storage from extension context.
-   */
-  static setupState(workspaceState: Memento): void {
-    _state = new State(workspaceState);
-  }
-
-  /**
-   * Get singleton instance of state.
-   */
-  static getInstance(): State {
-    return _state;
-  }
+  constructor(private storage: IStorage) {}
 
   /**
    * Get the active task.
    */
   get activeTask(): string | null {
-    return this.workspaceState.get('activeTask', null);
+    return this.storage.get('activeTask', null);
   }
 
   /**
@@ -48,14 +29,14 @@ export default class State {
       this.tasks[taskId].isActive = true;
     }
 
-    this.workspaceState.update('activeTask', taskId);
+    this.storage.update('activeTask', taskId);
   }
 
   /**
    * Get the task list
    */
   get tasks(): { [name: string]: Task } {
-    return this.workspaceState.get('tasks', {});
+    return this.storage.get('tasks', {});
   }
 
   /**
@@ -70,7 +51,7 @@ export default class State {
   addTask(task: Task): void {
     const tasks = this.tasks;
 
-    this.workspaceState.update('tasks', {
+    this.storage.update('tasks', {
       ...tasks,
       [task.id]: task,
     });
@@ -80,7 +61,7 @@ export default class State {
     const tasks = { ...this.tasks };
     delete tasks[task.id];
 
-    this.workspaceState.update('tasks', tasks);
+    this.storage.update('tasks', tasks);
   }
 
   updateTask(task: Task): void {
@@ -88,7 +69,15 @@ export default class State {
   }
 
   clear(): void {
-    this.workspaceState.update('activeTask', null);
-    this.workspaceState.update('tasks', {});
+    this.storage.update('activeTask', null);
+    this.storage.update('tasks', {});
+  }
+
+  /** Change storage used and sync them */
+  changeStorage(newStorage: IStorage) {
+    newStorage.import(this.storage.export()).then(() => {
+      this.storage.clear();
+      this.storage = newStorage;
+    });
   }
 }

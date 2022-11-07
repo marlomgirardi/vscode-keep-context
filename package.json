@@ -17,8 +17,26 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "extensionKind": ["workspace"],
   "contributes": {
-    "configuration": {},
+    "configuration": {
+      "title": "Keep Context",
+      "properties": {
+        "keepContext.contextStore": {
+          "type": "string",
+          "enum": [
+            "file",
+            "workspace"
+          ],
+          "enumDescriptions": [
+            "Store contexts in workspace store",
+            "Store contexts in file settings under .vscode"
+          ],
+          "default": "workspace",
+          "description": "Set the place to store contexts, workspace state or file (⚠️ not supported by workspace with multiple projects)"
+        }
+      }
+    },
     "keybindings": [
       {
         "key": "ctrl+k ctrl+shift+c",

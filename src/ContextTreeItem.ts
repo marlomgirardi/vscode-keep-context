@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
-import State from './State';
+import { state } from './global';
 
 /**
  * Contexts are used to create expressions to show/hide things.
@@ -51,7 +51,6 @@ export class ContextTreeItem extends TreeItem {
    * @param state Extension state
    */
   static fromState(): ContextTreeItem[] {
-    const state = State.getInstance();
     return Object.values(state.tasks).map((task) => {
       return new ContextTreeItem(task.id, task.name, task.isActive, Contexts.TASK, TreeItemCollapsibleState.None, {
         arguments: [task.id],

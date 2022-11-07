@@ -11,6 +11,7 @@ Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semv
 ### Added
 
 - Store `viewColumn` position for each file
+- Add "Context Store" (`file` or `workspace`) to **Keep Context** settings.
 
 ### Breaking changes
 

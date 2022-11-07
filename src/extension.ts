@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
+import { CONFIG_SECTION } from './config';
+import { init } from './global';
 import KeepContext from './KeepContext';
-import State from './State';
+import { changeStorage } from './Storage';
 import { getAllOpenedFiles, isTabSupported } from './utils';
 
 export function activate(context: vscode.ExtensionContext): void {
-  State.setupState(context.workspaceState);
+  init(context);
 
   const keepContext = new KeepContext();
 
@@ -26,6 +28,12 @@ export function activate(context: vscode.ExtensionContext): void {
     if ((hasClosed || hasOpened || hasChanged) && keepContext.isTaskActive()) {
       const files = getAllOpenedFiles();
       keepContext.updateFileList(files);
+    }
+  });
+
+  vscode.workspace.onDidChangeConfiguration((event) => {
+    if (event.affectsConfiguration(CONFIG_SECTION)) {
+      changeStorage();
     }
   });
 

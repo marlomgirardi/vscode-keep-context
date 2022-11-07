@@ -5,11 +5,11 @@ import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import GitProvider from './GitProvider';
 import { createTask, getAllOpenedFiles, taskInputBox } from './utils';
-import State from './State';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
 import Task, { File } from './Task';
 import logger from './logger';
+import { state } from './global';
 
 /**
  * Built in VS Code commands.
@@ -36,11 +36,6 @@ export default class KeepContext {
   readonly statusBarItem: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
 
   /**
-   * Keep Context state management.
-   */
-  private state: State;
-
-  /**
    * Git provider.
    */
   private git: GitProvider;
@@ -54,17 +49,16 @@ export default class KeepContext {
     this.git.onDidChangeBranch = this.onBranchChange;
     this.git.onDidInitialize = this.onGitInitialize;
 
-    this.state = State.getInstance();
     this.treeDataProvider = new ContextTreeDataProvider();
 
-    const activeTask = this.state.activeTask;
+    const activeTask = state.activeTask;
     if (activeTask) {
-      const task = this.state.tasks[activeTask];
+      const task = state.tasks[activeTask];
 
       if (task) {
         updateStatusBar(task.name);
       } else {
-        this.state.activeTask = null;
+        state.activeTask = null;
         this.treeDataProvider.refresh();
       }
     }
@@ -82,7 +76,7 @@ export default class KeepContext {
       )
       .then((selected) => {
         if (selected === 'Yes') {
-          this.state.clear();
+          state.clear();
           this.treeDataProvider.refresh();
         }
       });
@@ -97,7 +91,7 @@ export default class KeepContext {
         return;
       }
 
-      const tasks = this.state.tasks;
+      const tasks = state.tasks;
       const task = createTask(taskName);
       let keepFilesOpened = false;
 
@@ -110,7 +104,7 @@ export default class KeepContext {
 
       const openFiles = getAllOpenedFiles();
 
-      if (!this.state.activeTask && openFiles.length > 0) {
+      if (!state.activeTask && openFiles.length > 0) {
         keepFilesOpened = await window
           .showInformationMessage('Keep files opened?', 'Yes', 'No')
           .then((selected) => selected === 'Yes');
@@ -120,7 +114,7 @@ export default class KeepContext {
         task.files = openFiles;
       }
 
-      this.state.addTask(task);
+      state.addTask(task);
       this.activateTask(task.id, keepFilesOpened);
     });
   };
@@ -130,18 +124,18 @@ export default class KeepContext {
    * @param task available when using the Keep Context panel.
    */
   editTask = (task?: ContextTreeItem): void => {
-    const taskId = task?.id || this.state.activeTask;
+    const taskId = task?.id || state.activeTask;
 
     if (!taskId) {
       window.showWarningMessage('You must select a task to edit.');
       return;
     }
 
-    const selectedTask = this.state.getTask(taskId) as Task;
+    const selectedTask = state.getTask(taskId) as Task;
 
     taskInputBox(selectedTask.name, (value) => {
       const newTask = createTask(value);
-      const existentTask = this.state.getTask(newTask.id);
+      const existentTask = state.getTask(newTask.id);
 
       if (value !== selectedTask.name && existentTask) {
         return `A task with name "${value}" already exists.`;
@@ -154,8 +148,8 @@ export default class KeepContext {
 
         newTask.files = [...selectedTask.files];
 
-        this.state.addTask(newTask);
-        this.state.removeTask(selectedTask);
+        state.addTask(newTask);
+        state.removeTask(selectedTask);
 
         this.activateTask(newTask.id);
       }
@@ -167,16 +161,16 @@ export default class KeepContext {
    * @param task available when using the Keep Context panel.
    */
   deleteTask = (task?: ContextTreeItem): void => {
-    const taskId = task?.id || this.state.activeTask;
+    const taskId = task?.id || state.activeTask;
 
     if (!taskId) {
       window.showWarningMessage('You must select a task to remove.');
       return;
     }
 
-    if (this.state.tasks[taskId]) {
-      if (this.state.activeTask === taskId) {
-        this.state.activeTask = null;
+    if (state.tasks[taskId]) {
+      if (state.activeTask === taskId) {
+        state.activeTask = null;
 
         clearStatusBar();
 
@@ -189,14 +183,14 @@ export default class KeepContext {
         //       commands.executeCommand(BuiltInCommands.CloseAllEditors);
         //     }
 
-        //     delete this.state.tasks[task.id];
+        //     delete state.tasks[task.id];
 
-        //     this.state.save();
+        //     state.save();
         //     this.refresh();
         //   });
       }
 
-      delete this.state.tasks[taskId];
+      delete state.tasks[taskId];
 
       this.treeDataProvider.refresh();
     }
@@ -206,9 +200,9 @@ export default class KeepContext {
    * Activate task handler.
    */
   activateTask = (taskId: string, keepFilesOpened = false): void => {
-    if (this.state.activeTask !== taskId) {
+    if (state.activeTask !== taskId) {
       // TODO: use dirty state to prevent saving?
-      this.state.activeTask = null;
+      state.activeTask = null;
 
       let promise: Thenable<void | undefined> = Promise.resolve();
 
@@ -217,7 +211,7 @@ export default class KeepContext {
       }
 
       promise.then(() => {
-        const task = this.state.getTask(taskId);
+        const task = state.getTask(taskId);
         const filesNotFound: Array<string> = [];
 
         if (!task) {
@@ -225,7 +219,7 @@ export default class KeepContext {
           return;
         }
 
-        this.state.activeTask = taskId;
+        state.activeTask = taskId;
 
         if (task.branch) {
           this.git.setBranch(task.branch);
@@ -271,14 +265,14 @@ export default class KeepContext {
   };
 
   isTaskActive(): boolean {
-    return Boolean(this.state.activeTask && this.state.getTask(this.state.activeTask));
+    return Boolean(state.activeTask && state.getTask(state.activeTask));
   }
 
   selectTask = (): void => {
     const input = window.createQuickPick<QuickPickTask>();
 
     input.placeholder = 'Select a task to activate';
-    input.items = Object.values(this.state.tasks).map(QuickPickTask.fromTask);
+    input.items = Object.values(state.tasks).map(QuickPickTask.fromTask);
 
     if (input.items.length === 0) {
       window.showWarningMessage('No task is available for selection');
@@ -298,15 +292,15 @@ export default class KeepContext {
   };
 
   updateFileList = (files: File[]): void => {
-    if (!this.state.activeTask) return;
+    if (!state.activeTask) return;
 
-    const task = this.state.getTask(this.state.activeTask);
+    const task = state.getTask(state.activeTask);
 
     if (!task) return;
 
     task.files = files;
 
-    this.state.updateTask(task);
+    state.updateTask(task);
     this.treeDataProvider.refresh();
   };
 
@@ -315,8 +309,8 @@ export default class KeepContext {
    * @param branch The new branch
    */
   private onBranchChange = (branch?: string) => {
-    if (this.state.activeTask) {
-      this.state.tasks[this.state.activeTask].branch = branch;
+    if (state.activeTask) {
+      state.tasks[state.activeTask].branch = branch;
     }
   };
 
@@ -324,12 +318,12 @@ export default class KeepContext {
    * Handles the Git Initialization
    */
   private onGitInitialize = () => {
-    if (this.state.activeTask) {
-      const task = this.state.tasks[this.state.activeTask];
+    if (state.activeTask) {
+      const task = state.tasks[state.activeTask];
       if (task.branch) {
         this.git.setBranch(task.branch);
       } else {
-        this.state.tasks[this.state.activeTask].branch = this.git.branch;
+        state.tasks[state.activeTask].branch = this.git.branch;
       }
     }
   };
