@@ -2,11 +2,11 @@
   "name": "keep-context",
   "displayName": "Keep Context",
   "description": "Make context switch easy to be managed and tracked.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
-    "vscode": "^1.72.0"
+    "vscode": "^1.73.0"
   },
   "license": "MIT",
   "categories": [
