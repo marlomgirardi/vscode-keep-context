@@ -12,10 +12,12 @@ Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semv
 
 - Store `viewColumn` position for each file
 - Add "Context Store" (`file` or `workspace`) to **Keep Context** settings.
+- Store file relative path instead of full path.
 
 ### Breaking changes
 
-- By storing `viewColumn` it makes the old file storage incompatible, so once you select a new task
+- By storing `viewColumn` it makes the old file storage incompatible, so once you select a new task.
+- The old `path` file is not supported anymore, so previous states won't work.
 
 ## 0.3.0 - 2022-10-08
 

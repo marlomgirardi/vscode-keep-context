@@ -4,7 +4,7 @@ import { commands, StatusBarAlignment, StatusBarItem, Uri, window, workspace } f
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import GitProvider from './GitProvider';
-import { createTask, getAllOpenedFiles, taskInputBox } from './utils';
+import { createTask, getAllOpenedFiles, getFilePath, taskInputBox } from './utils';
 import { QuickPickTask } from './QuickPickTask';
 import { clearStatusBar, updateStatusBar } from './statusbar';
 import Task, { File } from './Task';
@@ -228,33 +228,41 @@ export default class KeepContext {
         updateStatusBar(task.name);
 
         if (!keepFilesOpened) {
-          task.files
-            .filter((file) => {
-              const hasFile = fs.existsSync(file.path);
-              if (!hasFile) filesNotFound.push(file.path);
-              return hasFile;
-            })
-            .forEach((file, idx) => {
-              workspace.openTextDocument(Uri.file(file.path)).then(
-                (document) => {
-                  // when showing multiple documents there is a concurrency problem with the returned TextEditor
-                  // https://github.com/microsoft/vscode/issues/145969#issuecomment-1077788421
-                  setTimeout(() => {
-                    window
-                      .showTextDocument(document, {
-                        viewColumn: file.viewColumn,
-                        preview: false,
-                        preserveFocus: true,
-                      })
-                      .then(undefined, (e) => logger.error(`Error showing file "${file.path}"`, e));
-                  }, 80 * idx);
-                },
-                (e) => logger.error(`Error opening file "${file.path}"`, e),
-              );
-            });
+          task.files.forEach((file, idx) => {
+            const filePath = getFilePath(file);
+
+            if (!filePath) {
+              filesNotFound.push(file.relativePath);
+              return;
+            }
+
+            if (!fs.existsSync(filePath)) {
+              filesNotFound.push(filePath);
+              return;
+            }
+
+            workspace.openTextDocument(Uri.file(filePath)).then(
+              (document) => {
+                // when showing multiple documents there is a concurrency problem with the returned TextEditor
+                // https://github.com/microsoft/vscode/issues/145969#issuecomment-1077788421
+                setTimeout(() => {
+                  window
+                    .showTextDocument(document, {
+                      viewColumn: file.viewColumn,
+                      preview: false,
+                      preserveFocus: true,
+                    })
+                    .then(undefined, (e) =>
+                      logger.error(`Error showing file "${file.relativePath}" from "${file.workspaceFolder}"`, e),
+                    );
+                }, 80 * idx);
+              },
+              (e) => logger.error(`Error opening file "${file.relativePath}" from "${file.workspaceFolder}"`, e),
+            );
+          });
 
           if (filesNotFound.length > 0) {
-            task.files = task.files.filter((file) => !filesNotFound.includes(file.path));
+            task.files = task.files.filter((file) => !filesNotFound.includes(getFilePath(file) as string));
             window.showWarningMessage(`Some files were not found in the file system:\n${filesNotFound.join('\n')}`);
           }
         }

@@ -1,7 +1,19 @@
 import { ViewColumn } from 'vscode';
 
 export interface File {
-  path: string;
+  /**
+   * Relative path from the workspace folder
+   */
+  relativePath: string;
+  /**
+   * The workspace folder name.
+   * If `undefined`, it is from outside the workspace.
+   */
+  workspaceFolder?: string;
+
+  /**
+   * The location where this file should be.
+   */
   viewColumn?: ViewColumn;
 }
 

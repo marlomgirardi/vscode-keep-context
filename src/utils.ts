@@ -1,4 +1,5 @@
-import { Tab, TabInputCustom, TabInputNotebook, TabInputText, window } from 'vscode';
+import path = require('path');
+import { Tab, TabInputCustom, TabInputNotebook, TabInputText, window, workspace } from 'vscode';
 import Task, { File } from './Task';
 
 /**
@@ -77,9 +78,21 @@ export function getAllOpenedFiles(): File[] {
         .flatMap((group) => group.tabs)
         .filter((tab) => !tab.isPreview && isTabSupported(tab))
         .map(({ input, group }) => ({
-          path: (input as KeepContextTabInput).uri.fsPath,
+          relativePath: workspace.asRelativePath((input as KeepContextTabInput).uri),
+          workspaceFolder: workspace.getWorkspaceFolder((input as KeepContextTabInput).uri)?.name,
           viewColumn: group.viewColumn,
         })),
     ),
   ];
+}
+
+export function getWorkspaceFolderFromName(name: string) {
+  return workspace.workspaceFolders?.find((folder) => folder.name === name);
+}
+
+export function getFilePath(file: File) {
+  if (!file.workspaceFolder) return file.relativePath;
+  const workspacePath = getWorkspaceFolderFromName(file.workspaceFolder)?.uri.fsPath;
+  if (!workspacePath) return null;
+  return path.join(workspacePath, file.relativePath);
 }
