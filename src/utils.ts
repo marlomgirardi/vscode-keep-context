@@ -71,19 +71,16 @@ export function isTabSupported(tab: Tab) {
 /**
  * Get a list of opened files supported by KeepContext.
  */
-export function getAllOpenedFiles(): File[] {
-  return [
-    ...new Set(
-      window.tabGroups.all
-        .flatMap((group) => group.tabs)
-        .filter((tab) => !tab.isPreview && isTabSupported(tab))
-        .map(({ input, group }) => ({
-          relativePath: workspace.asRelativePath((input as KeepContextTabInput).uri),
-          workspaceFolder: workspace.getWorkspaceFolder((input as KeepContextTabInput).uri)?.name,
-          viewColumn: group.viewColumn,
-        })),
-    ),
-  ];
+export function getAllOpenedFiles() {
+  return window.tabGroups.all
+    .flatMap((group) => group.tabs)
+    .filter((tab) => !tab.isPreview && isTabSupported(tab))
+    .map<File>(({ input, group, isActive }) => ({
+      relativePath: workspace.asRelativePath((input as KeepContextTabInput).uri),
+      workspaceFolder: workspace.getWorkspaceFolder((input as KeepContextTabInput).uri)?.name,
+      viewColumn: group.viewColumn,
+      isActive,
+    }));
 }
 
 export function getWorkspaceFolderFromName(name: string) {

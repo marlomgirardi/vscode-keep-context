@@ -247,6 +247,7 @@ export default class KeepContext {
               return;
             }
 
+            // TODO: Figure it out how to open tabs without using `showTextDocument` for every single file.
             workspace.openTextDocument(Uri.file(filePath)).then(
               (document) => {
                 // when showing multiple documents there is a concurrency problem with the returned TextEditor
