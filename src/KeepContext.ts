@@ -191,7 +191,7 @@ export default class KeepContext {
         //   });
       }
 
-      delete state.tasks[taskId];
+      state.removeTask(state.tasks[taskId]);
 
       this.treeDataProvider.refresh();
     }
