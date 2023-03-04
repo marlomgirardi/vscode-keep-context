@@ -25,6 +25,7 @@ In a simple way you can:
 - It may work in workspaces with more than one folder, but it only supports single folders.
 - It doesn't store `TabInputTextDiff`, `TabInputWebview`, `TabInputNotebookDiff`, and `TabInputTerminal`.
 - Preview tabs are not stored.
+- We don't have a listener for "tab group resize", it relies on tab group change to update that currently.
 
 ## Known Issues
 
