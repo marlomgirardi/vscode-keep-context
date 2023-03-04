@@ -9,6 +9,7 @@ Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semv
 ## Pre Release
 
 - Update dependencies
+- Store layout position within the task. Thanks to https://github.com/microsoft/vscode/pull/171224
 
 ## 0.4.0 - 2022-11-11
 

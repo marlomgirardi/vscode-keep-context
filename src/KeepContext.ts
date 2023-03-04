@@ -19,6 +19,7 @@ import { state } from './global';
 export enum BuiltInCommands {
   CloseAllEditors = 'workbench.action.closeAllEditors',
   SetEditorLayout = 'vscode.setEditorLayout',
+  GetEditorLayout = 'vscode.getEditorLayout',
 }
 
 /**
@@ -204,20 +205,25 @@ export default class KeepContext {
       // TODO: use dirty state to prevent saving?
       state.activeTask = null;
 
+      const task = state.getTask(taskId);
+
+      if (!task) {
+        logger.error(`Task "${taskId}" not found.`);
+        return;
+      }
+
       let promise: Thenable<void | undefined> = Promise.resolve();
 
       if (!keepFilesOpened) {
         promise = commands.executeCommand(BuiltInCommands.CloseAllEditors);
       }
 
-      promise.then(() => {
-        const task = state.getTask(taskId);
-        const filesNotFound: Array<string> = [];
-
-        if (!task) {
-          logger.error(`Task "${taskId}" not found.`);
-          return;
+      promise.then(async () => {
+        if (task.layout) {
+          await commands.executeCommand(BuiltInCommands.SetEditorLayout, task.layout);
         }
+
+        const filesNotFound: Array<string> = [];
 
         state.activeTask = taskId;
 
@@ -310,6 +316,17 @@ export default class KeepContext {
 
     state.updateTask(task);
     this.treeDataProvider.refresh();
+  };
+
+  updateLayout = async () => {
+    if (!state.activeTask) return;
+
+    const task = state.getTask(state.activeTask);
+    if (!task) return;
+
+    task.layout = await commands.executeCommand(BuiltInCommands.GetEditorLayout);
+
+    state.updateTask(task);
   };
 
   /**

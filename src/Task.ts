@@ -1,4 +1,5 @@
 import { ViewColumn } from 'vscode';
+import { EditorGroupLayout } from './typings/editorLayout';
 
 export interface File {
   /**
@@ -42,4 +43,9 @@ export default interface Task {
    * Flag to check if the current task is active.
    */
   isActive: boolean;
+
+  /**
+   * The layout of the editor for the task.
+   */
+  layout?: EditorGroupLayout;
 }

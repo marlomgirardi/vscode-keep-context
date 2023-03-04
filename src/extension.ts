@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext): void {
   vscode.commands.registerCommand('keepContext.selectTask', keepContext.selectTask);
 
   // https://code.visualstudio.com/api/references/vscode-api#Tab
-  vscode.window.tabGroups.onDidChangeTabs((tabEvent) => {
+  vscode.window.tabGroups.onDidChangeTabs(async (tabEvent) => {
     const hasClosed = tabEvent.closed.some((tab) => !tab.isPreview && isTabSupported(tab));
     const hasOpened = tabEvent.opened.some((tab) => !tab.isPreview && isTabSupported(tab));
     const hasChanged = tabEvent.changed.some((tab) => !tab.isPreview && isTabSupported(tab));
@@ -28,6 +28,7 @@ export function activate(context: vscode.ExtensionContext): void {
     if ((hasClosed || hasOpened || hasChanged) && keepContext.isTaskActive()) {
       const files = getAllOpenedFiles();
       keepContext.updateFileList(files);
+      await keepContext.updateLayout();
     }
   });
 
