@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Starting at `v1.0.0` this project will follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html). `v0.x` can be considered a beta version.
 
+## Pre Release
+
+- Update dependencies
+
 ## 0.4.0 - 2022-11-11
 
 ### Added

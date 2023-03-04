@@ -6,18 +6,19 @@
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
-    "vscode": "^1.73.0"
+    "vscode": "^1.77.0"
   },
   "license": "MIT",
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onView:keepContext",
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
-  "extensionKind": ["workspace"],
+  "extensionKind": [
+    "workspace"
+  ],
   "contributes": {
     "configuration": {
       "title": "Keep Context",
@@ -159,19 +160,19 @@
     "url": "https://github.com/marlomgirardi/vscode-keep-context/issues"
   },
   "devDependencies": {
-    "@types/glob": "^8.0.0",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "18.11.9",
-    "@types/vscode": "^1.73.0",
-    "@typescript-eslint/eslint-plugin": "^5.42.0",
-    "@typescript-eslint/parser": "^5.42.0",
-    "eslint": "^8.26.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "18.14.6",
+    "@types/vscode": "^1.76.0",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "glob": "^8.0.3",
-    "mocha": "^10.1.0",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.4",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5",
     "vscode-test": "^1.6.1"
   }
 }
