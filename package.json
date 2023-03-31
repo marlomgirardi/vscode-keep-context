@@ -2,7 +2,7 @@
   "name": "keep-context",
   "displayName": "Keep Context",
   "description": "Make context switch easy to be managed and tracked.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "publisher": "marlom",
   "icon": "images/keep-context.png",
   "engines": {
