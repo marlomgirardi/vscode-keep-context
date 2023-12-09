@@ -91,5 +91,5 @@ export function getFilePath(file: File) {
   if (!file.workspaceFolder) return file.relativePath;
   const workspacePath = getWorkspaceFolderFromName(file.workspaceFolder)?.uri.fsPath;
   if (!workspacePath) return null;
-  return path.join(workspacePath, file.relativePath);
+  return path.join(path.dirname(workspacePath), file.relativePath);
 }
