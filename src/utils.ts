@@ -1,6 +1,7 @@
 import path = require('path');
 import { Tab, TabInputCustom, TabInputNotebook, TabInputText, window, workspace } from 'vscode';
 import Task, { File } from './Task';
+import fs = require('fs');
 
 /**
  * Returns an empty task structure.
@@ -91,5 +92,9 @@ export function getFilePath(file: File) {
   if (!file.workspaceFolder) return file.relativePath;
   const workspacePath = getWorkspaceFolderFromName(file.workspaceFolder)?.uri.fsPath;
   if (!workspacePath) return null;
-  return path.join(path.dirname(workspacePath), file.relativePath);
+  let filePath = path.join(workspacePath, file.relativePath);
+  if (fs.existsSync(filePath)) return filePath;
+  filePath = path.join(path.dirname(workspacePath), file.relativePath);
+  if (fs.existsSync(filePath)) return filePath;
+  return null;
 }
