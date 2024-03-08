@@ -44,9 +44,9 @@ export default class GitProvider {
     }
   }
 
-  setBranch(branch: string): void {
+  async setBranch(branch: string): Promise<void> {
     if (this.branch === branch) return;
-    this.git.repositories[0]
+    await this.git.repositories[0]
       .checkout(branch)
       .then(() => (this.branch = branch))
       .catch((e) => logger.error(`Error during checkout of branch "${branch}"`, e));
