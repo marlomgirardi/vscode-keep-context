@@ -228,7 +228,7 @@ export default class KeepContext {
         state.activeTask = taskId;
 
         if (task.branch) {
-          this.git.setBranch(task.branch);
+          await this.git.setBranch(task.branch);
         }
 
         updateStatusBar(task.name);
