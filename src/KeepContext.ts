@@ -1,12 +1,12 @@
 import * as fs from 'fs';
-import { commands, StatusBarAlignment, StatusBarItem, Uri, window, workspace } from 'vscode';
+import { commands, StatusBarItem, Uri, window, workspace } from 'vscode';
 
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
 import GitProvider from './GitProvider';
 import { createTask, getAllOpenedFiles, getFilePath, taskInputBox } from './utils';
 import { QuickPickTask } from './QuickPickTask';
-import { clearStatusBar, updateStatusBar } from './statusbar';
+import { clearStatusBar, getStatusBarItem, updateStatusBar } from './statusbar';
 import Task, { File } from './Task';
 import logger from './logger';
 import { state } from './global';
@@ -34,7 +34,7 @@ export default class KeepContext {
   /**
    * Keep Context status bar item.
    */
-  readonly statusBarItem: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
+  readonly statusBarItem: StatusBarItem = getStatusBarItem();
 
   /**
    * Git provider.
@@ -42,6 +42,8 @@ export default class KeepContext {
   private git: GitProvider;
 
   constructor() {
+    this.statusBarItem.command = 'keepContext.selectTask';
+
     if (!workspace.workspaceFolders) {
       throw new Error('A workspace is required to run Keep Context.');
     }
