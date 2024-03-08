@@ -16,6 +16,11 @@ export interface File {
    * The location where this file should be.
    */
   viewColumn?: ViewColumn;
+
+  /**
+   * The line number to focus on in the editor.
+   */
+  focusedLine?: number;
 }
 
 export default interface Task {

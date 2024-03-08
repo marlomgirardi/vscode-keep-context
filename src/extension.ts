@@ -32,6 +32,10 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   });
 
+  context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(({ selections, textEditor }) => {
+    keepContext.updateFocusedLine(textEditor, selections[0].active.line);
+  }));
+
   vscode.workspace.onDidChangeConfiguration((event) => {
     if (event.affectsConfiguration(CONFIG_SECTION)) {
       changeStorage();
