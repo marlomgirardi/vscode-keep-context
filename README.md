@@ -1,5 +1,12 @@
 # VS Code - Keep Context
 
+> [!IMPORTANT]  
+> The way I've built this extension to work was to fit my needs and since VSCode 1.89.0 this is now supported out of the box.
+> 
+> I won't be actively maintaining this extension while that keeps being true, all you need to do to use the native one is to set `"scm.workingSets.enabled"` as true in your VSCode settings.
+>
+> You can read more about it in the [VSCode Source Control docs](https://code.visualstudio.com/docs/sourcecontrol/overview#_branches-and-tags).
+
 This extension was created to help those that at some point need to do some context switch and some times more often than we would like.
 With this extension you won't forget the files that you need to open to continue working in that task.
 
