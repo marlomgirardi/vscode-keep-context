@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { commands, StatusBarItem, Uri, window, workspace } from 'vscode';
+import { commands, Position, Range, Selection, StatusBarAlignment, StatusBarItem, TextEditor, TextEditorRevealType, Uri, window, workspace } from 'vscode';
 
 import { ContextTreeDataProvider } from './ContextTreeDataProvider';
 import { ContextTreeItem } from './ContextTreeItem';
@@ -261,7 +261,13 @@ export default class KeepContext {
                       preview: false,
                       preserveFocus: true,
                     })
-                    .then(undefined, (e) =>
+                    .then((value) => {
+                      setTimeout(() => {
+                        const line = file.focusedLine || 0;
+                        value.selection = new Selection(new Position(line, 0), new Position(line, 0));
+                        value.revealRange(new Range(line, 0, line, 0), TextEditorRevealType.InCenterIfOutsideViewport);
+                      }, 80 * idx);
+                    }, (e) =>
                       logger.error(`Error showing file "${file.relativePath}" from "${file.workspaceFolder}"`, e),
                     );
                 }, 80 * idx);
@@ -319,6 +325,22 @@ export default class KeepContext {
 
     state.updateTask(task);
     this.treeDataProvider.refresh();
+  };
+
+  updateFocusedLine = (editor: TextEditor, line: number): void => {
+    if (!state.activeTask) return;
+
+    const task = state.getTask(state.activeTask);
+    if (!task) return;
+
+    task.files = task.files.map((file) => {
+      if (file.relativePath === workspace.asRelativePath(editor.document.uri)) {
+        file.focusedLine = line;
+        return file;
+      }
+      return file;
+    });
+    state.updateTask(task);
   };
 
   updateLayout = async () => {
